@@ -22,7 +22,7 @@ The device will gather accelerometer and gyroscope data as well as pressure sens
 
 
 \section{Resources}
-We plan to use a Flora 9-DOF IMU Accelerometer/Gyroscope/Magnetometer (ST LSM9DS0) and a round Force-Sensitive Resistor (Interlink 402) as our on-board sensors. We will also have a small microcontroller (Arduino Gemma) and a Bluetooth LE module (Flora Bluefruit) to send data from the device to a laptop. We have one or two soft buttons on the device for user input during calibration as well as small LEDs for user feedback. 
+We plan to use a Flora 9-DOF IMU Accelerometer/Gyroscope/Magnetometer (ST LSM9DS0) and a round Force-Sensitive Resistor (Interlink 402) as our on-board sensors. We will also have an Adafruit Bluefruit LE Micro board, which contains an ATmega32u4 microcontroller and a Nordic nRF51822 to send data from the device to a laptop. We have one or two soft buttons on the device for user input during calibration as well as small LEDs for user feedback, all connected to the microcontroller. The system will be powered either by a 3V coin cell battery or a small battery pack.
 
 There are three main components of this project that can be done in parallel: (1) building the hardware system and connecting all the components together, (2) prototyping and 3D-printing the physical device, and (3) researching and/or writing the software that translates IMU data into positional data and realizes a finite state machine of the system. Once we have these three components done, we can integrate the system and write the user interface software.
 
