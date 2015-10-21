@@ -22,8 +22,7 @@ The device will gather accelerometer and gyroscope data as well as pressure sens
 
 
 \section{Resources}
-We plan to use either a Flora 9-DOF IMU (ST LSM9DS0) or an Adafruit 9-DOF Absolute Orientation IMU (Bosch BNO055) and a round Force-Sensitive Resistor (Interlink 402) as our on-board sensors. We will also have an Adafruit Bluefruit LE Micro board, which contains an ATmega32u4 microcontroller and a Nordic nRF51822 to send data from the device to a laptop. We have one or two soft buttons on the device for user input during calibration as well as small LEDs for user feedback, all connected to the microcontroller. The system will be powered either by a 3V coin cell battery or a small battery pack.
-
+We plan to use either a Bosch BNO055 Absolute Orientation IMU (on an Adafruit breakout board) and a round Force-Sensitive Resistor (Interlink 402) as our on-board sensors. We will also have a Nordic nRF51822 Bluetooth LE System on Chip (on a RedBearLab BLE Nano board) that contains an ARM Cortex M0 as a microcontroller to send data from the device to a laptop. We have one or two soft buttons on the device for user input during calibration as well as small LED(s) for user feedback, all connected to the microcontroller. The system will be powered either by a 3V coin cell battery or a small battery pack.
 
 There are three main components of this project that can be done in parallel: (1) building the hardware system and connecting all the components together, (2) prototyping and 3D-printing the physical device, and (3) researching and/or writing the software that translates IMU data into positional data and realizes a finite state machine of the system. Once we have these three components done, we can integrate the system and write the user interface software.
 
@@ -33,13 +32,13 @@ There are three main components of this project that can be done in parallel: (1
 \section{Schedule}
 \begin{itemize}
 \item October 20: Project charter (this document); Confirm mentor
-\item October 31: Choice of sensors and boards ordered after discussion with mentor and GSIs
+\item October 31: Choice of sensors and boards made and ordered after discussion with mentor and GSIs
 \item November 4: Learn how to 3D Print and have at least one prototype of the device; Have sufficient testing to confirm sensors and hardware choices and reorder parts if necessary
-\item November 11: Have code for sending data from microcontroller to laptop and for translating data into writing, test code; Find algorithm that outputs positional data from IMU data
+\item November 11: Have working code that gathers data from sensors to a laptop through wired microcontroller and reproduces writing; Have code that transfers arbitrary data from the Nordic M0 core to a laptop through BLE
 \item November 15: Project mini-update videos
 \item November 17-24: Project review with mentor/GSIs
 \item November 24: Project milestone report due
-\item December 10: Full system integration; UI developed
+\item December 10: Full system integration; UI developed; Drift errors computed
 \item December 14: Final presentation and demo
 \item December 16: Project report and video due; Peer evaluation due
 \end{itemize}
