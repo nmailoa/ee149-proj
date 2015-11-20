@@ -20,6 +20,7 @@
 /* Set the delay between fresh samples */
 #define BNO055_SAMPLERATE_DELAY_MS (10)
 
+int calibrated = 0;
 
 unsigned int accel_offset_x = 0;
 unsigned int accel_offset_y = 0;
@@ -124,8 +125,9 @@ void loop(void)
   
   
   
-  if (gyroCal == 3 && accelCal == 3 && magCal == 3){
+  if (gyroCal == 3 && accelCal == 3 && magCal == 3 && calibrated == 0){
     saveCalibration();
+    calibrated = 1;
     Serial.print(accel_offset_x);
     Serial.print(",");
     Serial.print(accel_offset_y);
@@ -160,8 +162,8 @@ void saveCalibration(){
   accel_offset_x |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_X_MSB_ADDR) << 8);
   accel_offset_y = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_LSB_ADDR);
   accel_offset_y |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_MSB_ADDR) << 8);
-  accel_offset_z = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_LSB_ADDR);
-  accel_offset_z |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_MSB_ADDR) << 8);
+  accel_offset_z = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Z_LSB_ADDR);
+  accel_offset_z |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Z_MSB_ADDR) << 8);
   
   mag_offset_x = bno.read8(Adafruit_BNO055::MAG_OFFSET_X_LSB_ADDR);
   mag_offset_x |= (bno.read8(Adafruit_BNO055::MAG_OFFSET_X_MSB_ADDR) << 8);
@@ -181,6 +183,38 @@ void saveCalibration(){
   accel_radius |= (bno.read8(Adafruit_BNO055::ACCEL_RADIUS_MSB_ADDR) << 8);
   mag_radius = bno.read8(Adafruit_BNO055::MAG_RADIUS_LSB_ADDR);
   mag_radius |= (bno.read8(Adafruit_BNO055::MAG_RADIUS_MSB_ADDR) << 8);
+  
+  bno.setMode(Adafruit_BNO055::OPERATION_MODE_NDOF);
+}
+
+void sendCalibration(){
+  bno.setMode(Adafruit_BNO055::OPERATION_MODE_CONFIG);
+  
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_X_LSB_ADDR, accel_offset_x & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_X_MSB_ADDR, (accel_offset_x >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Y_LSB_ADDR, accel_offset_y & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Y_MSB_ADDR, (accel_offset_y >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Z_LSB_ADDR, accel_offset_z & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Z_MSB_ADDR, (accel_offset_z >> 8) & 0xFF);
+
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_X_LSB_ADDR, mag_offset_x & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_X_MSB_ADDR, (mag_offset_x >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_Y_LSB_ADDR, mag_offset_y & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_Y_MSB_ADDR, (mag_offset_y >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_Z_LSB_ADDR, mag_offset_z & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_OFFSET_Z_MSB_ADDR, (mag_offset_z >> 8) & 0xFF);
+
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_X_LSB_ADDR, gyro_offset_x & 0xFF);
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_X_MSB_ADDR, (gyro_offset_x >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Y_LSB_ADDR, gyro_offset_y & 0xFF);
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Y_MSB_ADDR, (gyro_offset_y >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Z_LSB_ADDR, gyro_offset_z & 0xFF);
+  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Z_MSB_ADDR, (gyro_offset_z >> 8) & 0xFF);  
+
+  bno.write8(Adafruit_BNO055::ACCEL_RADIUS_LSB_ADDR, accel_radius & 0xFF);
+  bno.write8(Adafruit_BNO055::ACCEL_RADIUS_MSB_ADDR, (accel_radius >> 8) & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_RADIUS_LSB_ADDR, mag_radius & 0xFF);
+  bno.write8(Adafruit_BNO055::MAG_RADIUS_MSB_ADDR, (mag_radius >> 8) & 0xFF);
   
   bno.setMode(Adafruit_BNO055::OPERATION_MODE_NDOF);
 }
