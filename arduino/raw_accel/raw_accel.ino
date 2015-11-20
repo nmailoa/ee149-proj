@@ -82,7 +82,6 @@ void loop(void)
   // - VECTOR_EULER         - degrees
   // - VECTOR_LINEARACCEL   - m/s^2
   // - VECTOR_GRAVITY       - m/s^2
-  //imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
   imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
 
   /* Display the floating point data */
@@ -92,6 +91,18 @@ void loop(void)
   Serial.print(accel.y());
   Serial.print(",");
   Serial.print(accel.z());
+  Serial.print(",");
+  
+  
+  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+
+  /* Display the floating point data */
+  Serial.print("");
+  Serial.print(euler.x());
+  Serial.print(",");
+  Serial.print(euler.y());
+  Serial.print(",");
+  Serial.print(euler.z());
   Serial.print(",");
 
   /*
@@ -111,16 +122,11 @@ void loop(void)
   /* Display calibration status for each sensor. */
   uint8_t system, gyroCal, accelCal, magCal = 0;
   bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-  /*Serial.print("CALIBRATION: Sys=");
   Serial.print(system, DEC);
-  Serial.print(" Gyro=");
-  Serial.print(gyro, DEC);*/
   Serial.print(accelCal, DEC);
   Serial.print(gyroCal, DEC);
   Serial.print(magCal, DEC);
   Serial.print("\n");
-  /*Serial.print(" Mag=");
-  Serial.println(mag, DEC);*/
   
   
   
