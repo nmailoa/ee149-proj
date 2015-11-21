@@ -22,17 +22,17 @@
 
 int calibrated = 0;
 
-unsigned int accel_offset_x = 0;
-unsigned int accel_offset_y = 0;
-unsigned int accel_offset_z = 0;
-unsigned int mag_offset_x = 0;
+unsigned int accel_offset_x = 65516;
+unsigned int accel_offset_y = 65509;
+unsigned int accel_offset_z = 2;
+unsigned int mag_offset_x = 65529;
 unsigned int mag_offset_y = 0;
 unsigned int mag_offset_z = 0;
-unsigned int gyro_offset_x = 0;
-unsigned int gyro_offset_y = 0;
-unsigned int gyro_offset_z = 0;
-unsigned int accel_radius = 0;
-unsigned int mag_radius = 0;
+unsigned int gyro_offset_x = 65258;
+unsigned int gyro_offset_y = 116;
+unsigned int gyro_offset_z = 65087;
+unsigned int accel_radius = 1000;
+unsigned int mag_radius = 570;
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
@@ -66,6 +66,7 @@ void setup(void)
   bno.setExtCrystalUse(true);
 
   Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
+  sendCalibration();
 }
 
 /**************************************************************************/
@@ -112,20 +113,14 @@ void loop(void)
   /* Display calibration status for each sensor. */
   uint8_t system, gyroCal, accelCal, magCal = 0;
   bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-  /*Serial.print("CALIBRATION: Sys=");
   Serial.print(system, DEC);
-  Serial.print(" Gyro=");
-  Serial.print(gyro, DEC);*/
   Serial.print(accelCal, DEC);
   Serial.print(gyroCal, DEC);
   Serial.print(magCal, DEC);
-  Serial.print("\n");
-  /*Serial.print(" Mag=");
-  Serial.println(mag, DEC);*/
+  Serial.print("\n"); 
   
   
-  
-  if (gyroCal == 3 && accelCal == 3 && magCal == 3 && calibrated == 0){
+  /*if (gyroCal == 3 && accelCal == 3 && magCal == 3 && calibrated == 0){
     saveCalibration();
     calibrated = 1;
     Serial.print(accel_offset_x);
@@ -150,7 +145,11 @@ void loop(void)
     Serial.print(",");
     Serial.print(mag_radius);
     Serial.print("\n");
-  }
+  } */
+  
+  /*if (gyroCal < 2 || accelCal < 2) {
+    sendCalibration();
+  }*/
 
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
@@ -188,6 +187,7 @@ void saveCalibration(){
 }
 
 void sendCalibration(){
+  Serial.println("Sending calibration");
   bno.setMode(Adafruit_BNO055::OPERATION_MODE_CONFIG);
   
   bno.write8(Adafruit_BNO055::ACCEL_OFFSET_X_LSB_ADDR, accel_offset_x & 0xFF);
