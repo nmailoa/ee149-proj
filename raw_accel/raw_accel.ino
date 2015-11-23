@@ -43,7 +43,10 @@ Adafruit_BNO055 bno = Adafruit_BNO055();
 /**************************************************************************/
 void setup(void)
 {
-  Serial.begin(9600);
+  pinMode(7, INPUT);
+  pinMode(13, OUTPUT);
+  
+  Serial.begin(57600);
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
 
   /* Initialise the sensor */
@@ -67,6 +70,7 @@ void setup(void)
 
   Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
   sendCalibration();
+  
 }
 
 /**************************************************************************/
@@ -84,17 +88,48 @@ void loop(void)
   // - VECTOR_EULER         - degrees
   // - VECTOR_LINEARACCEL   - m/s^2
   // - VECTOR_GRAVITY       - m/s^2
-  //imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  
+  /* Display calibration status for each sensor. */
+  uint8_t system, gyroCal, accelCal, magCal = 0;
+  long time = 0;
+  time = millis();
+  bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
   imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  
+  
+  Serial.print(system, DEC);
+  Serial.print(accelCal, DEC);
+  Serial.print(gyroCal, DEC);
+  Serial.print(magCal, DEC);
+  Serial.print(",");
+  Serial.print('\t'); 
 
   /* Display the floating point data */
-  Serial.print("");
   Serial.print(accel.x());
   Serial.print(",");
+  Serial.print('\t');
   Serial.print(accel.y());
   Serial.print(",");
+  Serial.print('\t');
   Serial.print(accel.z());
   Serial.print(",");
+  Serial.print('\t');
+
+  /* Display the floating point data */
+  Serial.print(euler.x());
+  Serial.print(",");
+  Serial.print('\t');
+  Serial.print(euler.y());
+  Serial.print(",");
+  Serial.print('\t');
+  Serial.print(euler.z());
+  Serial.print(",");
+  Serial.print('\t');
+  
+  
+  Serial.print(time);
+  Serial.print("\n");
 
   /*
   // Quaternion data
@@ -110,14 +145,8 @@ void loop(void)
   Serial.print("\t\t");
   */
 
-  /* Display calibration status for each sensor. */
-  uint8_t system, gyroCal, accelCal, magCal = 0;
-  bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-  Serial.print(system, DEC);
-  Serial.print(accelCal, DEC);
-  Serial.print(gyroCal, DEC);
-  Serial.print(magCal, DEC);
-  Serial.print("\n"); 
+
+  
   
   
   /*if (gyroCal == 3 && accelCal == 3 && magCal == 3 && calibrated == 0){
@@ -147,9 +176,15 @@ void loop(void)
     Serial.print("\n");
   } */
   
-  /*if (gyroCal < 2 || accelCal < 2) {
+  /*if (accelCal < 2) {
     sendCalibration();
   }*/
+  
+  if(digitalRead(7)){
+    digitalWrite(13, HIGH);
+  } else {
+    digitalWrite(13, LOW);
+  }
 
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
