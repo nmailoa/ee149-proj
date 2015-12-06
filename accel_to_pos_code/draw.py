@@ -21,7 +21,9 @@ ey = (data[:,5]-data[0,5])/360*2*math.pi
 ex = (data[:,6]-data[0,6])/360*2*math.pi
 time = data[:,7]/1000
 
-print(az)
+ax = [i if (abs(i)>0.1) else 0 for i in ax]
+ay = [i if (abs(i)>0.1) else 0 for i in ay]
+az = [i if (abs(i)>0.1) else 0 for i in az]
 
 sex = np.sin(ex)
 sey = np.sin(ey)
@@ -35,16 +37,24 @@ ori_ay = np.copy(ay)
 ori_az = np.copy(az)
 
 # IIR low pass
-alpha = .8
+alpha = .9
 for i in range(len(ax)-1):
   ax[i+1] = ax[i]*alpha + ax[i+1]*(1-alpha)
   ay[i+1] = ay[i]*alpha + ay[i+1]*(1-alpha)
   az[i+1] = az[i]*alpha + az[i+1]*(1-alpha)
 
+#ax = ax - np.mean(ax)
+#ay = ay - np.mean(ay)
+#az = az - np.mean(az)
+
+
 # Move to real coordinates
-absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
-absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
-absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
+absolute_ax = cez*cex*ax + (sey*sez*cex - cey*sex)*ay + (cey*sez*cex + sey*sex)*az
+absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
+absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
+#absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
+#absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
+#absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
 
 
 vx = np.zeros(len(ax))
@@ -55,45 +65,56 @@ x = np.zeros(len(ax))
 y = np.zeros(len(ax))
 z = np.zeros(len(ax))
 
-#anchor = np.zeros(len(ax))
-#anchor[0] = 1
+anchor = np.zeros(len(ax))
+anchor[0] = 1
 
-"""
 fig = plt.figure()
 figA = fig.add_subplot(111, projection = "3d")
+#figA.set_aspect('equal')
 figA.scatter(x[0],y[0],z[0])
 #figA.view_init(elev=20, azim=47)
-"""
 
 last_zero = time[0];
 
-for i in range(len(ax)-1):
-  t = (time[i+1] - time[i])/1000
+
+for i in range(len(ax)-2):
+  t = (time[i+1] - time[i])
+  # update velocity
+  vx[i+1] = vx[i] + absolute_ax[i]*t
+  vy[i+1] = vy[i] + absolute_ay[i]*t
+  vz[i+1] = vz[i] + absolute_az[i]*t
+
+ori_vx = np.copy(vx)
+ori_vy = np.copy(vy)
+ori_vz = np.copy(vz)
+  
+
+for i in range(len(ax)-2):
+  t = (time[i+1] - time[i])
 
 
   # update velocity
   vx[i+1] = vx[i] + absolute_ax[i]*t
   vy[i+1] = vy[i] + absolute_ay[i]*t
   vz[i+1] = vz[i] + absolute_az[i]*t
+
   # update position
   x[i+1] = x[i] + vx[i]*t
   y[i+1] = y[i] + vy[i]*t
   z[i+1] = z[i] + vz[i]*t
 
-  """
-  if (vx[i+1] <= 0.1 and vy[i+1] <= 0.1 and vz[i+1] <= 0.1):
+  if (abs(absolute_ax[i+1]) <= 0.2 and abs(absolute_ay[i+1]) <= 0.2 and abs(absolute_az[i+1]) <= 0.2):
     if last_zero == 0:
       last_zero = time[i]
-      anchor[i] = 1
-
   else:
     last_zero = 0    
 
   # calibrate vel if more than half a second w no accel
-  if ((time[i+1] - last_zero) > .5):
+  if (last_zero != 0 and (time[i+1] - last_zero) > 0.5):
+    print("calibrate " + str(time[i+1]))
     last_anchor = [i for i, e in enumerate(anchor) if e != 0]
     last_anchor = last_anchor[-1]
-    print(vz[i])
+    print(time[last_anchor])
     for j in range(i - last_anchor+3):
       vx[j+last_anchor-1] = vx[j+last_anchor-1] - j/(i-last_anchor)*vx[i+1]
       vy[j+last_anchor-1] = vy[j+last_anchor-1] - j/(i-last_anchor)*vy[i+1]
@@ -101,25 +122,22 @@ for i in range(len(ax)-1):
       x[j+last_anchor] = x[j+last_anchor-1] + vx[j+last_anchor-1]*t
       y[j+last_anchor] = y[j+last_anchor-1] + vy[j+last_anchor-1]*t
       z[j+last_anchor] = z[j+last_anchor-1] + vz[j+last_anchor-1]*t
-    print(vz[i-1])
     x[i+1] = x[i] + vx[i]*t
     y[i+1] = y[i] + vy[i]*t
     z[i+1] = z[i] + vz[i]*t
     last_zero = time[i+1]
     anchor[i] = 1
-    print("calibrate " + str(i))
 
       
   #figA.scatter(x[i+1],y[i+1],z[i+1])
   #figA.plot([x[i],x[i+1]],[y[i],y[i+1]],[z[i],z[i+1]])
-  """
-"""
-figA.plot(x,y,z)
+
+
+figA.plot(x[:-1],y[:-1],z[:-1])
 figA.set_xlabel('x')
 figA.set_ylabel('y')
 figA.set_zlabel('z')
 plt.show()
-"""
 
 fig = plt.figure()
 #plt.plot(x)
@@ -128,41 +146,54 @@ fig = plt.figure()
 #plt.plot(vx)
 #plt.plot(vy)
 #plt.plot(vz)
-figA = fig.add_subplot(511)
-figA.plot(ori_ax)
-figA.plot(ori_ay)
-figA.plot(ori_az)
+figA = fig.add_subplot(321)
+figA.plot(time, ori_ax)
+figA.plot(time, ori_ay)
+figA.plot(time, ori_az)
 #plt.xlim([0,100])
+figA.axis('tight')
 plt.title('raw accel')
 plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
-figB = fig.add_subplot(512)
-figB.plot(ax)
-figB.plot(ay)
-figB.plot(az)
+figB = fig.add_subplot(322)
+figB.plot(time, ax)
+figB.plot(time, ay)
+figB.plot(time, az)
 #plt.xlim([0,100])
+figB.axis('tight')
 plt.title('filtered accel')
 plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
-figB = fig.add_subplot(513)
-figB.plot(absolute_ax)
-figB.plot(absolute_ay)
-figB.plot(absolute_az)
+figB = fig.add_subplot(323)
+figB.plot(time, absolute_ax)
+figB.plot(time, absolute_ay)
+figB.plot(time, absolute_az)
 #plt.xlim([0,100])
+figB.axis('tight')
 plt.title('absolute accel')
 plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
-figC = fig.add_subplot(514)
-figC.plot(vx)
-figC.plot(vy)
-figC.plot(vz)
-plt.title('vel')
+figC = fig.add_subplot(324)
+figC.plot(time, ori_vx)
+figC.plot(time, ori_vy)
+figC.plot(time, ori_vz)
+plt.title('unadjusted vel')
+figC.axis('tight')
 plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
-figD = fig.add_subplot(515)
-figD.plot(x)
-figD.plot(y)
-figD.plot(z)
+figC = fig.add_subplot(325)
+figC.plot(time, vx)
+figC.plot(time, vy)
+figC.plot(time, vz)
+plt.title('adjusted vel')
+figC.axis('tight')
+plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+figD = fig.add_subplot(326)
+figD.plot(time, x)
+figD.plot(time, y)
+figD.plot(time, z)
+figD.axis('tight')
 plt.title('position')
 plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
