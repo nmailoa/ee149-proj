@@ -68,11 +68,7 @@ z = np.zeros(len(ax))
 anchor = np.zeros(len(ax))
 anchor[0] = 1
 
-fig = plt.figure()
-figA = fig.add_subplot(111, projection = "3d")
-#figA.set_aspect('equal')
-figA.scatter(x[0],y[0],z[0])
-#figA.view_init(elev=20, azim=47)
+
 
 last_zero = time[0];
 
@@ -132,6 +128,15 @@ for i in range(len(ax)-2):
   #figA.scatter(x[i+1],y[i+1],z[i+1])
   #figA.plot([x[i],x[i+1]],[y[i],y[i+1]],[z[i],z[i+1]])
 
+m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
+
+fig = plt.figure()
+figA = fig.add_subplot(111, projection = "3d")
+figA.set_xlim([-m, m])
+figA.set_ylim([-m, m])
+figA.set_zlim([-m, m])
+figA.scatter(x[0],y[0],z[0])
+#figA.view_init(elev=20, azim=47)
 
 figA.plot(x[:-1],y[:-1],z[:-1])
 figA.set_xlabel('x')
