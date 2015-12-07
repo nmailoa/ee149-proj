@@ -21,9 +21,9 @@ ey = (data[:,5]-data[0,5])/360*2*math.pi
 ex = (data[:,6]-data[0,6])/360*2*math.pi
 time = data[:,7]/1000
 
-ax = [i if (abs(i)>0.1) else 0 for i in ax]
-ay = [i if (abs(i)>0.1) else 0 for i in ay]
-az = [i if (abs(i)>0.1) else 0 for i in az]
+ax = [i if (abs(i)>0.15) else 0 for i in ax]
+ay = [i if (abs(i)>0.15) else 0 for i in ay]
+az = [i if (abs(i)>0.15) else 0 for i in az]
 
 sex = np.sin(ex)
 sey = np.sin(ey)
