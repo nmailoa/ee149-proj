@@ -7,7 +7,7 @@ import sys
 from numpy import genfromtxt
 
 if (len(sys.argv) != 2):
-  print("Usage: python draw.py filename.csv")
+  print("Usage: python draw-button.py filename.csv")
 
 data = genfromtxt(sys.argv[1], delimiter=',')
 #ax = np.round((data[:,1]-data[0,1])*5)/5
@@ -66,12 +66,12 @@ for i in range(len(ax)-1):
 
 
 # Move to real coordinates
-absolute_ax = cez*cex*ax + (sey*sez*cex - cey*sex)*ay + (cey*sez*cex + sey*sex)*az
-absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
-absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
-#absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
-#absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
-#absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
+#absolute_ax = cez*cex*ax + (sey*sez*cex - cey*sex)*ay + (cey*sez*cex + sey*sex)*az
+#absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
+#absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
+absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
+absolute_ay = cey*sez*ax + (sex*sey*sez + cex*cez)*ay + (cex*sey*sez - sex*cez)*az
+absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
 
 
 vx = np.zeros(len(ax))
@@ -144,14 +144,16 @@ for i in range(len(ax)-2):
   if (last_zero != 0 and (time[i+1] - last_zero) > 0.5):
     last_v_anchor = [i for i, e in enumerate(v_anchor) if e != 0]
     last_v_anchor = last_v_anchor[-1]
+    """
     found = 0
     idx = last_v_anchor
     while(not found):
-      if (abs(vx[idx+1]-x[idx]) < 0.01 and abs(y[idx+1]-y[idx]) < 0.01 and abs(z[idx+1]-z[idx]) < 0.01 and idx < i):
+      if (abs(vx[idx+1]-vx[idx]) < 0.01 and abs(vy[idx+1]-vy[idx]) < 0.01 and abs(vz[idx+1]-vz[idx]) < 0.01 and idx < i):
         idx = idx + 1
       else:
         found = 1
     last_v_anchor = idx
+    """
     if (i != last_v_anchor):
       for j in range(i - last_v_anchor+3):
         vx[j+last_v_anchor-1] = vx[j+last_v_anchor-1] - j/(i-last_v_anchor)*vx[i+1]
@@ -187,6 +189,8 @@ v_anchor[0] = 1
 p_anchor = np.zeros(len(ax))
 p_anchor[0] = 1
 
+last_zero = time[0]
+
 # Velocity and position correction
 for i in range(len(ax)-2):
   t = (time[i+1] - time[i])
@@ -208,18 +212,25 @@ for i in range(len(ax)-2):
   else:
     last_zero = 0    
 
+  if (753 < time[i] and time[i] < 754):
+    print(time[i+1] - last_zero)
+
   # calibrate vel if more than half a second w no accel
   if (last_zero != 0 and (time[i+1] - last_zero) > 0.5):
     last_v_anchor = [i for i, e in enumerate(v_anchor) if e != 0]
     last_v_anchor = last_v_anchor[-1]
+    """
     found = 0
     idx = last_v_anchor
     while(not found):
-      if (abs(vx[idx+1]-x[idx]) < 0.01 and abs(y[idx+1]-y[idx]) < 0.01 and abs(z[idx+1]-z[idx]) < 0.01 and idx < i):
+      if (abs(vx[idx+1]-vx[idx]) < 0.01 and abs(vy[idx+1]-vy[idx]) < 0.01 and abs(vz[idx+1]-vz[idx]) < 0.01 and idx < i):
         idx = idx + 1
       else:
         found = 1
+    print(time[last_v_anchor])
+    print(time[idx])
     last_v_anchor = idx
+    """
     if (i != last_v_anchor):
       for j in range(i - last_v_anchor+3):
         vx[j+last_v_anchor-1] = vx[j+last_v_anchor-1] - j/(i-last_v_anchor)*vx[i+1]
@@ -235,6 +246,7 @@ for i in range(len(ax)-2):
     v_anchor[i] = 1
 
   if (button[i-1]==0 and button[i]==1 ):
+    print("calibrate " + str(time[i]))
     last_p_anchor = [i for i, e in enumerate(p_anchor) if e != 0]
     last_p_anchor = last_p_anchor[-1]
     found = 0
@@ -253,10 +265,10 @@ for i in range(len(ax)-2):
       else:
         found = 1
 
-    print(time[i])
-    print(time[last_p_anchor])
-    print(time[idx])
-    print(time[idx2])
+    #print(time[i])
+    #print(time[last_p_anchor])
+    #print(time[idx])
+    #print(time[idx2])
     orix = x[idx]
     oriy = y[idx]
     oriz = z[idx]
@@ -268,7 +280,7 @@ for i in range(len(ax)-2):
         z[j+idx2] = z[j+idx2] - j/(idx-idx2)*(z[idx+1]-z[idx2])
     if (idx != i):
       for j in range(i - idx+2):
-        print("modifying2 " + str(time[j+idx-1]))
+        #print("modifying2 " + str(time[j+idx-1]))
         x[j+idx] = 0
         y[j+idx] = 0
         z[j+idx] = 0
