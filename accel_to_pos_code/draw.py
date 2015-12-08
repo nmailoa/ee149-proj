@@ -65,12 +65,12 @@ for i in range(len(ax)-1):
 
 
 # Move to real coordinates
-absolute_ax = cez*cex*ax + (sey*sez*cex - cey*sex)*ay + (cey*sez*cex + sey*sex)*az
-absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
-absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
-#absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
-#absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
-#absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
+#absolute_ax = cez*cex*ax + (sey*sez*cex - cey*sex)*ay + (cey*sez*cex + sey*sex)*az
+#absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
+#absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
+absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
+absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
+absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
 
 
 vx = np.zeros(len(ax))
