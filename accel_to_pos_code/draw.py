@@ -21,10 +21,6 @@ ey = (data[:,5]-data[0,5])/360*2*math.pi
 ex = (data[:,6]-data[0,6])/360*2*math.pi
 time = data[:,7]/1000
 
-ax = [i if (abs(i)>0.15) else 0 for i in ax]
-ay = [i if (abs(i)>0.15) else 0 for i in ay]
-az = [i if (abs(i)>0.15) else 0 for i in az]
-
 sex = np.sin(ex)
 sey = np.sin(ey)
 sez = np.sin(ez)
@@ -35,6 +31,26 @@ cez = np.cos(ez)
 ori_ax = np.copy(ax)
 ori_ay = np.copy(ay)
 ori_az = np.copy(az)
+
+# 2nd level calibration
+mean_x = 0
+mean_y = 0
+mean_z = 0
+for i in range(len(ax)-1):
+  if (abs(ax[i+1] - mean_x) < 0.2):
+    mean_x = mean_x * 0.99 + ax[i+1] * 0.01
+  if (abs(ay[i+1] - mean_y) < 0.2):
+    mean_y = mean_y * 0.99 + ay[i+1] * 0.01
+  if (abs(az[i+1] - mean_z) < 0.2):
+    mean_z = mean_z * 0.99 + az[i+1] * 0.01
+  ax[i+1] = ax[i+1] - mean_x
+  ay[i+1] = ay[i+1] - mean_y
+  az[i+1] = az[i+1] - mean_z
+
+
+ax = [i if (abs(i)>0.15) else 0 for i in ax]
+ay = [i if (abs(i)>0.15) else 0 for i in ay]
+az = [i if (abs(i)>0.15) else 0 for i in az]
 
 # IIR low pass
 alpha = .9
@@ -88,7 +104,6 @@ ori_vz = np.copy(vz)
 for i in range(len(ax)-2):
   t = (time[i+1] - time[i])
 
-
   # update velocity
   vx[i+1] = vx[i] + absolute_ax[i]*t
   vy[i+1] = vy[i] + absolute_ay[i]*t
@@ -110,7 +125,6 @@ for i in range(len(ax)-2):
     print("calibrate " + str(time[i+1]))
     last_anchor = [i for i, e in enumerate(anchor) if e != 0]
     last_anchor = last_anchor[-1]
-    print(time[last_anchor])
     for j in range(i - last_anchor+3):
       vx[j+last_anchor-1] = vx[j+last_anchor-1] - j/(i-last_anchor)*vx[i+1]
       vy[j+last_anchor-1] = vy[j+last_anchor-1] - j/(i-last_anchor)*vy[i+1]

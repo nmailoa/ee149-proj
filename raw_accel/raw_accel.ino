@@ -20,6 +20,8 @@
 /* Set the delay between fresh samples */
 #define BNO055_SAMPLERATE_DELAY_MS (10)
 
+#define LED (13)
+
 int calibrated = 0;
 
 unsigned int accel_offset_x = 65516;
@@ -36,6 +38,11 @@ unsigned int mag_radius = 570;
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
+
+uint8_t system, gyroCal, accelCal, magCal = 0;
+long time = 0;
+boolean button = 0;
+
 /**************************************************************************/
 /*
     Arduino setup function (automatically called at startup)
@@ -43,8 +50,8 @@ Adafruit_BNO055 bno = Adafruit_BNO055();
 /**************************************************************************/
 void setup(void)
 {
-  pinMode(7, INPUT);
-  pinMode(13, OUTPUT);
+  pinMode(6, INPUT);
+  pinMode(LED, OUTPUT);
   
   Serial.begin(57600);
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
@@ -90,13 +97,13 @@ void loop(void)
   // - VECTOR_GRAVITY       - m/s^2
   
   /* Display calibration status for each sensor. */
-  uint8_t system, gyroCal, accelCal, magCal = 0;
-  long time = 0;
+  
+  
   time = millis();
   bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
   imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  
+  button = digitalRead(6);
   
   Serial.print(system, DEC);
   Serial.print(accelCal, DEC);
@@ -124,6 +131,10 @@ void loop(void)
   Serial.print(",");
   Serial.print('\t');
   Serial.print(euler.z());
+  Serial.print(",");
+  Serial.print('\t');
+
+  Serial.print(button);
   Serial.print(",");
   Serial.print('\t');
   
@@ -180,10 +191,10 @@ void loop(void)
     sendCalibration();
   }*/
   
-  if(digitalRead(7)){
-    digitalWrite(13, HIGH);
+  if(button){
+    digitalWrite(LED, HIGH);
   } else {
-    digitalWrite(13, LOW);
+    digitalWrite(LED, LOW);
   }
 
   delay(BNO055_SAMPLERATE_DELAY_MS);
