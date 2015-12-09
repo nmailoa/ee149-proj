@@ -10,9 +10,6 @@ if (len(sys.argv) != 2):
   print("Usage: python draw-button.py filename.csv")
 
 data = genfromtxt(sys.argv[1], delimiter=',')
-#ax = np.round((data[:,1]-data[0,1])*5)/5
-#ay = np.round((data[:,2]-data[0,2])*5)/5
-#az = -np.round((data[:,3]-data[0,3])*5)/5
 ax = (data[:,1]-data[0,1])
 ay = (data[:,2]-data[0,2])
 az = (data[:,3]-data[0,3])
@@ -38,16 +35,15 @@ mean_x = 0
 mean_y = 0
 mean_z = 0
 for i in range(len(ax)-1):
-  if (abs(ax[i+1] - mean_x) < 0.2):
-    mean_x = mean_x * 0.99 + ax[i+1] * 0.01
-  if (abs(ay[i+1] - mean_y) < 0.2):
-    mean_y = mean_y * 0.99 + ay[i+1] * 0.01
-  if (abs(az[i+1] - mean_z) < 0.2):
-    mean_z = mean_z * 0.99 + az[i+1] * 0.01
+  #if (abs(ax[i+1] - mean_x) < 0.2):
+  mean_x = mean_x * 0.999 + ax[i+1] * 0.001
+  #if (abs(ay[i+1] - mean_y) < 0.2):
+  mean_y = mean_y * 0.999 + ay[i+1] * 0.001
+  #if (abs(az[i+1] - mean_z) < 0.2):
+  mean_z = mean_z * 0.999 + az[i+1] * 0.001
   ax[i+1] = ax[i+1] - mean_x
   ay[i+1] = ay[i+1] - mean_y
   az[i+1] = az[i+1] - mean_z
-
 
 ax = [i if (abs(i)>0.15) else 0 for i in ax]
 ay = [i if (abs(i)>0.15) else 0 for i in ay]
@@ -59,10 +55,6 @@ for i in range(len(ax)-1):
   ax[i+1] = ax[i]*alpha + ax[i+1]*(1-alpha)
   ay[i+1] = ay[i]*alpha + ay[i+1]*(1-alpha)
   az[i+1] = az[i]*alpha + az[i+1]*(1-alpha)
-
-#ax = ax - np.mean(ax)
-#ay = ay - np.mean(ay)
-#az = az - np.mean(az)
 
 
 # Move to real coordinates
@@ -105,6 +97,14 @@ ori_vz = np.copy(vz)
   
 
 
+
+
+
+
+"""
+Velocity correction only
+"""
+
 vx = np.zeros(len(ax))
 vy = np.zeros(len(ay))
 vz = np.zeros(len(az))
@@ -119,7 +119,6 @@ v_anchor[0] = 1
 p_anchor = np.zeros(len(ax))
 p_anchor[0] = 1
 
-# Velocity correction
 for i in range(len(ax)-2):
   t = (time[i+1] - time[i])
 
@@ -175,6 +174,10 @@ ori_z = np.copy(z)
 
 
 
+"""
+Velocity and position correction
+"""
+
 vx = np.zeros(len(ax))
 vy = np.zeros(len(ay))
 vz = np.zeros(len(az))
@@ -191,7 +194,6 @@ p_anchor[0] = 1
 
 last_zero = time[0]
 
-# Velocity and position correction
 for i in range(len(ax)-2):
   t = (time[i+1] - time[i])
 
@@ -274,10 +276,16 @@ for i in range(len(ax)-2):
     oriz = z[idx]
 
     if (idx != idx2):
+      #csx = np.cumsum(vx[idx2:idx+1])
+      #csy = np.cumsum(vy[idx2:idx+1])
+      #csz = np.cumsum(vz[idx2:idx+1])
       for j in range(idx - idx2+1):
-        x[j+idx2] = x[j+idx2] - j/(idx-idx2)*(x[idx+1]-x[idx2])
-        y[j+idx2] = y[j+idx2] - j/(idx-idx2)*(y[idx+1]-y[idx2])
-        z[j+idx2] = z[j+idx2] - j/(idx-idx2)*(z[idx+1]-z[idx2])
+        x[j+idx2] = x[j+idx2] - (j/(idx-idx2))**1.5*(x[idx+1]-x[idx2])
+        y[j+idx2] = y[j+idx2] - (j/(idx-idx2))**1.5*(y[idx+1]-y[idx2])
+        z[j+idx2] = z[j+idx2] - (j/(idx-idx2))**1.5*(z[idx+1]-z[idx2])
+        #x[j+idx2] = x[j+idx2] - csx[j]/csx[-1]*(x[idx]-x[idx2])
+        #y[j+idx2] = y[j+idx2] - csy[j]/csy[-1]*(y[idx]-y[idx2])
+        #z[j+idx2] = z[j+idx2] - csz[j]/csz[-1]*(z[idx]-z[idx2])
     if (idx != i):
       for j in range(i - idx+2):
         #print("modifying2 " + str(time[j+idx-1]))
