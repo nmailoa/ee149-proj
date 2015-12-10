@@ -3,8 +3,130 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
 import sys
-
+import serial
+import glob
+import time
+import re
+import os
 from numpy import genfromtxt
+
+
+
+
+def serial_ports():
+  """Lists serial ports
+  Raises:
+  EnvironmentError:
+      On unsupported or unknown platforms
+  Returns:
+      A list of available serial ports
+  """
+  if sys.platform.startswith('win'):
+    ports = ['COM' + str(i + 1) for i in range(256)]
+  elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+      # this is to exclude your current terminal "/dev/tty"
+    ports = glob.glob('/dev/tty[A-Za-z]*')
+  elif sys.platform.startswith('darwin'):
+    ports = glob.glob('/dev/tty.*')
+  else:
+    raise EnvironmentError('Unsupported platform')
+  result = []
+  for port in ports:
+    try:
+      s = serial.Serial(port)
+      s.close()
+      result.append(port)
+    except (OSError, serial.SerialException):
+      pass
+  return result
+
+
+
+def run():
+
+  ports = serial_ports()
+  if ports:
+    print("Available serial ports:")
+    for (i,p) in enumerate(ports):
+      print("%d) %s"%(i+1,p))
+  else:
+    print("No ports available. Check serial connection and try again.")
+    print("Exiting...")
+    return
+
+  portNo = input("Select the port to use: ")
+  ser = serial.Serial(ports[int(portNo)-1])
+  ser.baudrate=57600 
+  ser.timeout=5
+
+
+  ser.flush()
+  count = 0
+  
+
+  buff = []
+  while(True):
+    buff.append(ser.read(100))
+    count = count + 1
+    if (count == 100):
+      t0 = time.time()
+    if (count == 200):
+      t = time.time() - t0
+      print(t)
+      print(100*100/t)
+      print(buff)
+      break
+    
+
+
+run()
+
+"""
+  m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
+
+  fig = plt.figure()
+  figA = fig.add_subplot(111, projection = "3d")
+  figA.set_xlim([-m, m])
+  figA.set_ylim([-m, m])
+  figA.set_zlim([-m, m])
+  figA.scatter(x[0],y[0],z[0])
+  figA.plot(x,y,z)
+  figA.set_xlabel('x')
+  figA.set_ylabel('y')
+  figA.set_zlabel('z')
+  plt.show()
+
+  fig = plt.figure()
+  figB = fig.add_subplot(311)
+  figB.plot(t, ax)
+  figB.plot(t, ay)
+  figB.plot(t, az)
+  figB.axis('tight')
+  plt.title('filtered accel')
+  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+  figC = fig.add_subplot(312)
+  figC.plot(t, vx)
+  figC.plot(t, vy)
+  figC.plot(t, vz)
+  plt.title('adjusted vel')
+  figC.axis('tight')
+  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+  figD = fig.add_subplot(313)
+  figD.plot(t, x)
+  figD.plot(t, y)
+  figD.plot(t, z)
+  figD.axis('tight')
+  plt.title('position')
+  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+  plt.tight_layout()
+  plt.show()
+
+
+
+run()
 
 if (len(sys.argv) != 2):
   print("Usage: python draw.py filename.csv")
@@ -69,7 +191,7 @@ for i in range(len(ax)-1):
 #absolute_ay = cez*sex*ax + (sey*sez*sex + cey*cex)*ay + (cey*sez*sex - sey*cex)*az
 #absolute_az = -sez*ax + sey*cez*ay + cey*cez*az
 absolute_ax = cey*cez*ax + (sex*sey*cez - cex*sez)*ay + (cex*sey*cez + sex*sez)*az
-absolute_ay = cey*sez*ax + (sex*sey*sez + cex*cez)*ay + (cex*sey*sez - sex*cez)*az
+absolute_ay = cey*sez*ax + (sex*sey*sez + cex*sez)*ay + (cex*sey*sez - sex*cez)*az
 absolute_az = -sey*ax + sex*cey*ay + cex*cey*az
 
 
@@ -218,3 +340,5 @@ plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
 
 plt.tight_layout()
 plt.show()
+
+"""

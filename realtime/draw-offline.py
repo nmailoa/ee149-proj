@@ -9,6 +9,8 @@ import time
 import re
 import os
 from numpy import genfromtxt
+import warnings
+warnings.filterwarnings("ignore")
 
 
 ax = np.array([])
@@ -26,32 +28,6 @@ v_anchor = np.array([])
 CHUNKS = 20
 
 
-def serial_ports():
-  """Lists serial ports
-  Raises:
-  EnvironmentError:
-      On unsupported or unknown platforms
-  Returns:
-      A list of available serial ports
-  """
-  if sys.platform.startswith('win'):
-    ports = ['COM' + str(i + 1) for i in range(256)]
-  elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-      # this is to exclude your current terminal "/dev/tty"
-    ports = glob.glob('/dev/tty[A-Za-z]*')
-  elif sys.platform.startswith('darwin'):
-    ports = glob.glob('/dev/tty.*')
-  else:
-    raise EnvironmentError('Unsupported platform')
-  result = []
-  for port in ports:
-    try:
-      s = serial.Serial(port)
-      s.close()
-      result.append(port)
-    except (OSError, serial.SerialException):
-      pass
-  return result
 
 
 
@@ -59,23 +35,8 @@ def run():
   global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor
   print("reWRITE Position Reconstruction")
 
-  ports = serial_ports()
-  if ports:
-    print("Available serial ports:")
-    for (i,p) in enumerate(ports):
-      print("%d) %s"%(i+1,p))
-  else:
-    print("No ports available. Check serial connection and try again.")
-    print("Exiting...")
-    return
+  ser = open('data', 'r')
 
-  portNo = input("Select the port to use: ")
-  ser = serial.Serial(ports[int(portNo)-1])
-  ser.baudrate=57600 
-  ser.timeout=1
-  ser.write("5".encode())
-  ser.readline()
-  ser.timeout=5
 
   cur_idx = 0
   mean_x = 0
@@ -90,57 +51,25 @@ def run():
   base_ey = 0
   base_ez = 0
 
-  ser.flush()
   failcount = 0
 
   calibrated = 0
-  while(calibrated != 3):
-    try:
-      line = ser.readline().decode().rstrip('\n')
-      data = re.split(",", line)
-      if (data[0][2] == '3'):
-        calibrated = 1
-      if (calibrated == 1 and data[0][3] == '3'):
-        calibrated = 2
-      if (calibrated == 2 and data[0][1] == '3'):
-        calibrated = 3
-      print(data[0])
-    except:
-      pass
-
-  plt.ion()
-  fig = plt.figure()
-  figA = fig.add_subplot(111, projection = "3d")
-  figA.set_xlabel('x')
-  figA.set_ylabel('y')
-  figA.set_zlabel('z')
-
-  print("Recording in 3...")
-  time.sleep(1)
-  print("2...")
-  time.sleep(1)
-  print("1...")
-  time.sleep(1)
-  print("Start")
-  ser.write('1'.encode())
-  ser.flushInput()
-  print(ser.inWaiting())
-  t0 = time.time()
 
 
-  data_file = open('data', 'w')
+  #data_file = open('data', 'w')
+  
+  #Throw away first 20
+  #for i in range(20):
+  #  line = ser.readline()
+  allex = np.array([])
+
   plt.ion()
   fig = plt.figure()
   #figA = fig.add_subplot(111, projection = "3d")
   figA = fig.add_subplot(111)
   figA.set_xlabel('x')
   figA.set_ylabel('y')
-
-  
-  
-  #Throw away first 20
-  for i in range(20):
-    line = ser.readline()
+  #figA.set_zlabel('z')
 
   while(True):
     print(cur_idx)
@@ -155,10 +84,11 @@ def run():
       if (failcount > 20):
         break
       try:
-        line = ser.readline().decode().rstrip('\n')
-        data_file.write(line)
-        data_file.write('\n')
+        line = ser.readline().rstrip('\n')
+        #data_file.write(line)
+        #data_file.write('\n')
         data = re.split(",", line)
+        #print(data)
 
         # Get rid of mean and threshold
 
@@ -174,6 +104,7 @@ def run():
         mean_y = mean_y * 0.999 + temp * 0.001
         temp = temp - mean_y if abs(temp-mean_y) > 0.15 else 0
         last_ay = last_ay*alpha + temp*(1-alpha)
+        #print(last_ay)
         tay[count] = last_ay
 
         temp = float(data[3])
@@ -202,7 +133,7 @@ def run():
         failcount = failcount + 1
         pass
 
-   
+    allex = np.append(allex, ez)
     sex = np.sin(ex)
     sey = np.sin(ey)
     sez = np.sin(ez)
@@ -252,7 +183,10 @@ def run():
 
       # calibrate vel if more than half a second w no accel
       v_anchor = np.append(v_anchor, [0])
-      if (last_zero != 0 and (t[i] - last_zero) > 0.3):
+      #print(last_zero)
+      #print(t[i])
+      if (last_zero != 0 and (t[i] - last_zero) > 0.5):
+        print("calibrate " + str(i))
         last_v_anchor = [j for j, e in enumerate(v_anchor) if e != 0]
         last_v_anchor = last_v_anchor[-1]
         if (i != last_v_anchor):
@@ -274,33 +208,31 @@ def run():
 
     cur_idx = cur_idx + CHUNKS 
     
-    if (cur_idx >= 700):
-      print(time.time() - t0)
+    if (cur_idx >= 500):
+      #print(time.time() - t0)
       break
-    
+    #m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
     m = max(max(abs(x)), max(abs(y)))
     figA.set_xlim([-m, m])
     figA.set_ylim([-m, m])
+    #figA.set_zlim([-m, m])
+    #if (cur_idx == CHUNKS):
+    #  figA.plot(x,y)
+    #  print(x)
+    #else:
+    #  figA.plot(x[cur_idx-CHUNKS-1:], y[cur_idx-CHUNKS-1:])
+    #  print(x[cur_idx-CHUNKS-1:])
+#,z[cur_idx:cur_idx+CHUNKS])
+    #plt.show()
     figA.cla()
     figA.plot(x,y)
     fig.canvas.draw()
-        
-  plt.show()
+    #time.sleep(0.5)
 
 """
 
-    m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
-    figA.set_xlim([-m, m])
-    figA.set_ylim([-m, m])
-    figA.set_zlim([-m, m])
-    figA.plot(x[cur_idx:cur_idx+CHUNKS],y[cur_idx:cur_idx+CHUNKS],z[cur_idx:cur_idx+CHUNKS])
-    #plt.show()
-    fig.canvas.draw()
-"""
+  m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
 
-
-
-"""
   fig = plt.figure()
   figA = fig.add_subplot(111, projection = "3d")
   figA.set_xlim([-m, m])
@@ -361,7 +293,8 @@ def run():
   text_file.write(', '.join([str(x) for x in t]))
   text_file.write('\n')
   text_file.close()
-  data_file.close()
+  #data_file.close()
+  #print(allex)
 """
 
 run()

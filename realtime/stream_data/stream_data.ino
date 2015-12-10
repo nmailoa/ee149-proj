@@ -39,10 +39,19 @@ unsigned int mag_radius = 570;
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
 
-uint8_t system, gyroCal, accelCal, magCal = 0;
+uint8_t sys, gyroCal, accelCal, magCal = 0;
 long time = 0;
 boolean button = 0;
 boolean sync = 0;
+int do_loop = 0;
+//boolean debug = 0;
+long count = 0;
+
+ISR(TIMER1_COMPA_vect)
+{
+do_loop = 1;
+count++;
+}
 
 /**************************************************************************/
 /*
@@ -52,12 +61,34 @@ boolean sync = 0;
 void setup(void)
 {
   sync = 0;
+  do_loop = 0;
   
   pinMode(6, INPUT);
   pinMode(LED, OUTPUT);
+
+  //pinMode(12, OUTPUT);
+  cli();          // disable global interrupts
+  TCCR1A = 0;     // set entire TCCR1A register to 0
+  TCCR1B = 0;     // same for TCCR1B
+
+  // set compare match register to desired timer count:
+  OCR1A = 390;//15624;//390;   // ~25ms period
+
+  // turn on CTC mode:
+  TCCR1B |= (1 << WGM12);
+
+  // Set CS10 and CS12 bits for 1024 prescaler:
+  TCCR1B |= (1 << CS10);
+  TCCR1B |= (1 << CS12);
+
+  // enable timer compare interrupt:
+  TIMSK1 |= (1 << OCIE1A);
+  sei();          // enable global interrupts
+  
   
   Serial.begin(57600);
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
+  Serial.println(do_loop);
 
   /* Initialise the sensor */
   if(!bno.begin())
@@ -79,9 +110,12 @@ void setup(void)
   bno.setExtCrystalUse(true);
 
   Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
-  sendCalibration();
+  //sendCalibration();
   
 }
+
+
+
 
 /**************************************************************************/
 /*
@@ -101,43 +135,51 @@ void loop(void)
   
   /* Display calibration status for each sensor. */
   
-  
-  time = millis();
-  bno.getCalibration(&system, &gyroCal, &accelCal, &magCal);
+  if (do_loop){
+  //time = millis();
+  bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
   imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
   button = digitalRead(6);
   
-  Serial.print(system, DEC);
+  Serial.print(sys, DEC);
   Serial.print(accelCal, DEC);
   Serial.print(gyroCal, DEC);
   Serial.print(magCal, DEC);
   Serial.print(",");
   //Serial.print('\t'); 
 
+  if (sync == 0)
+    Serial.print('\n');
   if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
-    
+    sync = 1;
+    digitalWrite(13, HIGH);
+    while (Serial.read() != '1');
+    digitalWrite(13, LOW);
+    Serial.print("3333,");
   }
+  
+  if (sync){
 
   /* Display the floating point data */
-  Serial.print(accel.x());
+  Serial.print(accel.x(), 2);
   Serial.print(",");
   //Serial.print('\t');
-  Serial.print(accel.y());
+  Serial.print(accel.y(), 2);
   Serial.print(",");
   //Serial.print('\t');
-  Serial.print(accel.z());
+  Serial.print(accel.z(), 2);
   Serial.print(",");
   //Serial.print('\t');
 
   /* Display the floating point data */
-  Serial.print(euler.x());
+  Serial.print(euler.x(), 2);
   Serial.print(",");
   //Serial.print('\t');
-  Serial.print(euler.y());
+  Serial.print(euler.y(), 2);
   Serial.print(",");
   //Serial.print('\t');
-  Serial.print(euler.z());
+  Serial.print(euler.z(), 2);
   Serial.print(",");
   //Serial.print('\t');
 
@@ -146,9 +188,11 @@ void loop(void)
   //Serial.print('\t');
   
   
-  Serial.print(time);
+  Serial.print(count);//time);
   Serial.print("\n");
-
+  }
+  do_loop = 0;
+  }
   /*
   // Quaternion data
   imu::Quaternion quat = bno.getQuat();
@@ -204,7 +248,7 @@ void loop(void)
     digitalWrite(LED, LOW);
   }
 
-  delay(BNO055_SAMPLERATE_DELAY_MS);
+  //delay(BNO055_SAMPLERATE_DELAY_MS);
 }
 
 void saveCalibration(){
