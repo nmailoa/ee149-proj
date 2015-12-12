@@ -52,16 +52,29 @@ ax = [i if (abs(i)>0.15) else 0 for i in ax]
 ay = [i if (abs(i)>0.15) else 0 for i in ay]
 az = [i if (abs(i)>0.15) else 0 for i in az]
 
+
 # IIR low pass
-alpha = .9
+alpha = .92
 for i in range(len(ax)-1):
   ax[i+1] = ax[i]*alpha + ax[i+1]*(1-alpha)
   ay[i+1] = ay[i]*alpha + ay[i+1]*(1-alpha)
   az[i+1] = az[i]*alpha + az[i+1]*(1-alpha)
 
-#ax = ax - np.mean(ax)
-#ay = ay - np.mean(ay)
-#az = az - np.mean(az)
+
+# attempted high pass
+beta = 0.9
+for i in range(len(ax)-1):
+  ax[i+1] = (ax[i]*beta - ax[i+1]*(1-beta))*1
+  ay[i+1] = (ay[i]*beta - ay[i+1]*(1-beta))*1
+  az[i+1] = (az[i]*beta - az[i+1]*(1-beta))*1
+
+ax = ax - np.mean(ay+az)
+ay = ay - np.mean(ax+az)
+az = az - np.mean(ax+ay)
+
+# ax = ax - np.mean(ax)
+# ay = ay - np.mean(ay)
+# az = az - np.mean(az)
 
 
 # Move to real coordinates
