@@ -39,7 +39,7 @@ unsigned int mag_radius = 570;
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
 
-uint8_t sys, gyroCal, accelCal, magCal = 0;
+uint8_t sys, gyroCal, accelCal, magCal = 0xf;
 long time = 0;
 boolean button = 0;
 boolean sync = 0;
@@ -49,6 +49,7 @@ byte count = 0;
 byte cur_count = 0;
 
 char buff[60] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+char test[5] = {'0', '1', '2', '3', '4'};
 int reading_no = 0;
 int ax = 0;
 int ay = 0;
@@ -59,8 +60,8 @@ int ez = 0;
 
 ISR(TIMER1_COMPA_vect)
 {
-do_loop = 1;
-count++;
+  do_loop = 1;
+  count++;
 }
 
 /**************************************************************************/
@@ -99,27 +100,26 @@ void setup(void)
   
   
   Serial.begin(57600);
-  Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
-  Serial.println(do_loop);
+  //Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
 
   /* Initialise the sensor */
-  if(!bno.begin())
-  {
+  /*if(!bno.begin())
+  {*/
     /* There was a problem detecting the BNO055 ... check your connections */
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
+    /*Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    /while(1);
+  }*/
 
   delay(1000);
 
   /* Display the current temperature */
-  /*int8_t temp = bno.getTemp();
-  Serial.print("Current Temperature: ");
-  Serial.print(temp);
-  Serial.println(" C");
-  Serial.println("");*/
+  //int8_t temp = bno.getTemp();
+  //Serial.print("Current Temperature: ");
+  //Serial.print(temp);
+  //Serial.println(" C");
+  //Serial.println("");
 
-  bno.setExtCrystalUse(true);
+  //bno.setExtCrystalUse(true);
 
   //Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
   //sendCalibration();
@@ -148,70 +148,112 @@ void loop(void)
   /* Display calibration status for each sensor. */
   
   if (do_loop){
-  //time = millis();
+    //time = millis();
     cur_count = count;
-    bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
+    /*bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
     imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
     imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    button = digitalRead(6);
+    button = digitalRead(6);*/
 
+    /*if (sync == 0)
+    {
+      Serial.print(sys, DEC);
+      Serial.print(accelCal, DEC);
+      Serial.print(gyroCal, DEC);
+      Serial.print(magCal, DEC);
+      Serial.print(",");
+      Serial.print('\n');
+    }
     if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
+      sync = 1;
+      digitalWrite(13, HIGH);
+      while (Serial.read() != '1');
+      digitalWrite(13, LOW);
+      Serial.print("Start");
+    }*/
+  
+    //if (sync){
+      /*ax = abs(int(accel.x()*10)) & 0x3FF
+      if (ax < 0) ax |= 0x400;
+      ay = abs(int(accel.y()*10)) & 0x3FF
+      if (ay < 0) ay |= 0x400;
+      az = abs(int(accel.z()*10)) & 0x3FF
+      if (az < 0) az |= 0x400;*/
+
+      ax = (ax+1) & 0x3FF;
+      ay = (ay+1) & 0x3FF;
+      az = (az+1) & 0x3FF;
+      ex = (ex+1) & 0x7FFF;
+      ey = (ey+1) & 0x7FFF;
+      ez = (ez+1) & 0x7FFF;
+      button = (button+1) & 0x3;
+
+      ax = ay = az = 0xfff;
+      ex = ey = ez = 0xffff;
+      sys = accelCal = gyroCal = magCal = 0x3;
+      button = 0x7;
+      
+      // Data packet
+      buff[12*reading_no] = char(1 << 7 | button << 4 | ax >> 8);
+      buff[12*reading_no+1] = char(ax & 0xff);
+      buff[12*reading_no+2] = char(ay >> 4);
+      buff[12*reading_no+3] = char((ay & 0xf) << 4 | az >> 8);
+      buff[12*reading_no+4] = char(az & 0xff);
+      buff[12*reading_no+5] = char(ex >> 8);
+      buff[12*reading_no+6] = char(ex & 0xff);
+      buff[12*reading_no+7] = char(ey >> 8);
+      buff[12*reading_no+8] = char(ey & 0xff);
+      buff[12*reading_no+9] = char(ez >> 8);
+      buff[12*reading_no+10] = char(ez & 0xff);
+      buff[12*reading_no+11] = char(cur_count);
+
+      // Calibration packet
       buff[12*reading_no] = char(1 << 7);
       buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
-      buff[12*reading_no+11] = char(cur_count);
-      
-      Serial.write((const unsigned char*)buff, 60);
-      Serial.flush();
-      reading_no = 0;
-      
-      digitalWrite(LED, HIGH);
-      while (Serial.read() != '1');
-      sync = 1;
-      digitalWrite(LED, LOW);
-    }
-    else {
-      if (sync == 0){
-        buff[12*reading_no] = char(1 << 7);
-        buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
-        buff[12*reading_no+11] = char(cur_count);
-      }
-      else {
-        ax = int(accel.x()*100);
-        //if (ax < 0) ax = abs(ax) | 0x800;
-        //ax = ax & 0xfff;
-        ay = int(accel.y()*100);
-        //if (ay < 0) ax = abs(ay) | 0x800;
-        //ay = ay & 0xfff;
-        az = int(accel.z()*100);
-        //if (az < 0) az = abs(az) | 0x800;
-        //az = az & 0xfff;
 
-        ex = int(euler.x()*100);
-        ey = int(euler.y()*100);
-        ez = int(euler.z()*100);
-        
-        buff[12*reading_no] = char(1 << 7 | button << 4 | ax >> 8);
-        buff[12*reading_no+1] = char(ax & 0xff);
-        buff[12*reading_no+2] = char(ay >> 4);
-        buff[12*reading_no+3] = char((ay & 0xf) << 4 | (az >> 8) & 0xf);
-        buff[12*reading_no+4] = char(az & 0xff);
-        buff[12*reading_no+5] = char(ex >> 8);
-        buff[12*reading_no+6] = char(ex & 0xff);
-        buff[12*reading_no+7] = char(ey >> 8);
-        buff[12*reading_no+8] = char(ey & 0xff);
-        buff[12*reading_no+9] = char(ez >> 8);
-        buff[12*reading_no+10] = char(ez & 0xff);
-        buff[12*reading_no+11] = char(cur_count);
-      }
+      //Serial.println(buff[12*reading_no+1]);
+      
       reading_no++;
       if (reading_no > 4) {
+        /* send packets */
         Serial.write((const unsigned char*)buff, 60);
+        //Serial.println();
         reading_no = 0;
       }
-    }
-    
+    //}
     do_loop = 0;
   }
+  /* Display the floating point data */
+  /*Serial.print(accel.x(), 2);
+  Serial.print(",");
+  //Serial.print('\t');
+  Serial.print(accel.y(), 2);
+  Serial.print(",");
+  //Serial.print('\t');
+  Serial.print(accel.z(), 2);
+  Serial.print(",");
+  //Serial.print('\t');*/
+
+  /* Display the floating point data */
+  /*Serial.print(euler.x(), 2);
+  Serial.print(",");
+  //Serial.print('\t');
+  Serial.print(euler.y(), 2);
+  Serial.print(",");
+  //Serial.print('\t');
+  Serial.print(euler.z(), 2);
+  Serial.print(",");
+  //Serial.print('\t');
+
+  Serial.print(button);
+  Serial.print(",");
+  //Serial.print('\t');
+  
+  
+  Serial.print(count);//time);
+  Serial.print("\n");*/
+  
+  
   /*
   // Quaternion data
   imu::Quaternion quat = bno.getQuat();
