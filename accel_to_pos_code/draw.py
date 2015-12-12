@@ -125,8 +125,8 @@ for i in range(len(ax)-2):
   vz[i+1] = vz[i] + absolute_az[i]*t
 
   # update position
-  x[i+1] = x[i] + vx[i]*t - len_pen*sex[i] # assuming pen along z-axis
-  y[i+1] = y[i] + vy[i]*t - len_pen*sey[i] # assuming pen along z-axis
+  x[i+1] = x[i] + vx[i]*t - len_pen*sey[i] # assuming pen along z-axis
+  y[i+1] = y[i] + vy[i]*t - len_pen*sex[i] # assuming pen along z-axis
   z[i+1] = z[i] + vz[i]*t
 
   if (abs(absolute_ax[i+1]) <= 0.2 and abs(absolute_ay[i+1]) <= 0.2 and abs(absolute_az[i+1]) <= 0.2):
