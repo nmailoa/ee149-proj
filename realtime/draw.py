@@ -94,26 +94,19 @@ def run():
   failcount = 0
 
   calibrated = 0
-  while(calibrated != 3):
+  while(calibrated != 1):
     try:
+      """
       line = ser.readline().decode().rstrip('\n')
       data = re.split(",", line)
-      if (data[0][2] == '3'):
-        calibrated = 1
-      if (calibrated == 1 and data[0][3] == '3'):
-        calibrated = 2
-      if (calibrated == 2 and data[0][1] == '3'):
-        calibrated = 3
-      print(data[0])
+      """
+
+      line = (ser.read(12))
+      c = line[1]
+      print(str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03))
+      if (c & 0x3f == 0x03f): calibrated == 1
     except:
       pass
-
-  plt.ion()
-  fig = plt.figure()
-  figA = fig.add_subplot(111, projection = "3d")
-  figA.set_xlabel('x')
-  figA.set_ylabel('y')
-  figA.set_zlabel('z')
 
   print("Recording in 3...")
   time.sleep(1)
@@ -134,9 +127,7 @@ def run():
   #figA = fig.add_subplot(111, projection = "3d")
   figA = fig.add_subplot(111)
   figA.set_xlabel('x')
-  figA.set_ylabel('y')
-
-  
+  figA.set_ylabel('y')  
   
   #Throw away first 20
   for i in range(20):
@@ -153,31 +144,59 @@ def run():
     count = 0
     while count < CHUNKS:
       if (failcount > 20):
-        break
+        print("Failed more than 20 times")
+        exit()
       try:
+        """
         line = ser.readline().decode().rstrip('\n')
         data_file.write(line)
         data_file.write('\n')
         data = re.split(",", line)
+        """
+
+        line = (ser.read(12))
+
+        ax = (line[0] & 0xf) << 8 | line[1]
+        if (ax & 0x800): ax = -1*int((ax ^ 0xfff) + 1)
+        ax = ax/100
+
+        ay = line[2] << 4 | (line[3] >> 8)
+        if (ay & 0x800): ay = -1*int((ay ^ 0xfff) + 1)
+        ay = ay/100
+
+        az = (line[3] & 0xf) << 8 | line[4]
+        if (az & 0x800): az = -1*int((az ^ 0xfff) + 1)
+        az = az/100
+
+        ez = line[5] << 8 | line[6]
+        ez = int(ez)/100
+
+        ey = line[7] << 8 | line[8]
+        if (ey & 0x8000): ey = -1*int((ey ^ 0xffff) + 1)
+        ey = int(ey)/100
+
+        ex = line[9] << 8 | line[10]
+        if (ex & 0x8000): ex = -1*int((ex ^ 0xffff) + 1)
+        ex = int(ex)/100
+
+        time = int(line[11])*15/1000
+        if (time < t[-1]): time = t[-1] + time
 
         # Get rid of mean and threshold
 
-        temp = float(data[1])
-        #if (abs(temp - mean_x) < 0.2):
+        temp = float(ax)
         mean_x = mean_x * 0.999 + temp * 0.001
         temp = temp - mean_x if abs(temp-mean_x) > 0.15 else 0
         last_ax = last_ax*alpha + temp*(1-alpha)
         tax[count] = last_ax
 
-        temp = float(data[2])
-        #if (abs(temp - mean_y) < 0.2):
+        temp = float(ay)
         mean_y = mean_y * 0.999 + temp * 0.001
         temp = temp - mean_y if abs(temp-mean_y) > 0.15 else 0
         last_ay = last_ay*alpha + temp*(1-alpha)
         tay[count] = last_ay
 
-        temp = float(data[3])
-        #if (abs(temp - mean_z) < 0.2):
+        temp = float(az)
         mean_z = mean_z * 0.999 + temp * 0.001
         temp = temp - mean_z if abs(temp-mean_z) > 0.15 else 0
         last_az = last_az*alpha + temp*(1-alpha)
@@ -187,15 +206,16 @@ def run():
           ex[count] = 0
           ey[count] = 0
           ez[count] = 0
-          base_ez = float(data[4])
-          base_ey = float(data[5])
-          base_ex = float(data[6])
+          base_ez = ez
+          base_ey = ey
+          base_ex = ex
         else:
-          ez[count] = -(float(data[4]) - base_ez)/360*2*math.pi
-          ey[count] = (float(data[5]) - base_ey)/360*2*math.pi
-          ex[count] = (float(data[6]) - base_ex)/360*2*math.pi
+          ez[count] = -(ez - base_ez)/360*2*math.pi
+          ey[count] = (ey - base_ey)/360*2*math.pi
+          ex[count] = (ex - base_ex)/360*2*math.pi
 
-        t = np.append(t, int(data[8])*25/1000)
+        
+        t = np.append(t, time)
         count = count + 1
 
       except:

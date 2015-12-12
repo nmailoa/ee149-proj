@@ -44,7 +44,7 @@ long time = 0;
 boolean button = 0;
 boolean sync = 0;
 int do_loop = 0;
-//boolean debug = 0;
+boolean debug = 0;
 byte count = 0;
 byte cur_count = 0;
 
@@ -57,10 +57,16 @@ int ex = 0;
 int ey = 0;
 int ez = 0;
 
+imu::Vector<3> accel;
+imu::Vector<3> euler;
+
 ISR(TIMER1_COMPA_vect)
 {
+digitalWrite(5, debug);
 do_loop = 1;
 count++;
+if (debug) debug = 0;
+else debug = 1;
 }
 
 /**************************************************************************/
@@ -75,8 +81,9 @@ void setup(void)
   reading_no = 0;
   count = 0;
   
-  pinMode(6, INPUT);
+  pinMode(0, INPUT);
   pinMode(LED, OUTPUT);
+  pinMode(5, OUTPUT);
 
   //pinMode(12, OUTPUT);
   cli();          // disable global interrupts
@@ -84,7 +91,7 @@ void setup(void)
   TCCR1B = 0;     // same for TCCR1B
 
   // set compare match register to desired timer count:
-  OCR1A = 390;//15624;//390;   // ~25ms period
+  OCR1A = 117;//156; //195;//100; //390;//15624;//390;   // ~25ms period
 
   // turn on CTC mode:
   TCCR1B |= (1 << WGM12);
@@ -151,9 +158,9 @@ void loop(void)
   //time = millis();
     cur_count = count;
     bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
-    imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-    imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    button = digitalRead(6);
+    accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+    euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+    button = digitalRead(0);
 
     if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
       buff[12*reading_no] = char(1 << 7);
@@ -189,6 +196,7 @@ void loop(void)
         ex = int(euler.x()*100);
         ey = int(euler.y()*100);
         ez = int(euler.z()*100);
+        
         
         buff[12*reading_no] = char(1 << 7 | button << 4 | ax >> 8);
         buff[12*reading_no+1] = char(ax & 0xff);
