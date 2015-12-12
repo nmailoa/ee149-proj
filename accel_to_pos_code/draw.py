@@ -6,6 +6,8 @@ import sys
 
 from numpy import genfromtxt
 
+len_pen = 0.1 # length of pen in meters
+
 if (len(sys.argv) != 2):
   print("Usage: python draw.py filename.csv")
 
@@ -16,9 +18,9 @@ data = genfromtxt(sys.argv[1], delimiter=',')
 ax = (data[:,1]-data[0,1])
 ay = (data[:,2]-data[0,2])
 az = (data[:,3]-data[0,3])
-ez = -(data[:,4]-data[0,4])/360*2*math.pi
-ey = (data[:,5]-data[0,5])/360*2*math.pi
-ex = (data[:,6]-data[0,6])/360*2*math.pi
+ez = -(data[:,4]-data[0,4])/360*2*math.pi # yaw
+ey = (data[:,5]-data[0,5])/360*2*math.pi # pitch
+ex = (data[:,6]-data[0,6])/360*2*math.pi # roll
 time = data[:,7]/1000
 
 sex = np.sin(ex)
@@ -123,8 +125,8 @@ for i in range(len(ax)-2):
   vz[i+1] = vz[i] + absolute_az[i]*t
 
   # update position
-  x[i+1] = x[i] + vx[i]*t
-  y[i+1] = y[i] + vy[i]*t
+  x[i+1] = x[i] + vx[i]*t - len_pen*sex[i] # assuming pen along z-axis
+  y[i+1] = y[i] + vy[i]*t - len_pen*sey[i] # assuming pen along z-axis
   z[i+1] = z[i] + vz[i]*t
 
   if (abs(absolute_ax[i+1]) <= 0.2 and abs(absolute_ay[i+1]) <= 0.2 and abs(absolute_az[i+1]) <= 0.2):

@@ -108,12 +108,12 @@ def run():
     except:
       pass
 
-  plt.ion()
-  fig = plt.figure()
-  figA = fig.add_subplot(111, projection = "3d")
-  figA.set_xlabel('x')
-  figA.set_ylabel('y')
-  figA.set_zlabel('z')
+  # plt.ion()
+  # fig = plt.figure()
+  # figA = fig.add_subplot(111, projection = "3d")
+  # figA.set_xlabel('x')
+  # figA.set_ylabel('y')
+  # figA.set_zlabel('z')
 
   print("Recording in 3...")
   time.sleep(1)
@@ -274,7 +274,7 @@ def run():
 
     cur_idx = cur_idx + CHUNKS 
     
-    if (cur_idx >= 700):
+    if (cur_idx >= 5000):
       print(time.time() - t0)
       break
     
