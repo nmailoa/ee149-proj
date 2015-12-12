@@ -101,26 +101,45 @@ def run():
       if (failcount > 20):
         break
       try:
-        line = ser.read(12)
-        print(line)
-        print(hex(line >> 11*8))
-        print('\t')
-        print(hex(line >> 77 & 0x3FF))
-        print('\t')
-        print(hex(line >> 66 & 0x3FF))
-        print('\t')
-        print(hex(line >> 55 & 0x3FF))
-        print('\t')
-        print(hex(line >> 40 & 0x7FF))
-        print('\t')
-        print(hex(line >> 25 & 0x7FF))
-        print('\t')
-        print(hex(line >> 10 & 0x7FF))
-        print('\t')
-        print(hex(line >> 8 & 0x3))
-        print('\t')
-        print(hex(line & 0xFF))
-        print('\n')
+        line = (ser.read(12))
+        print(line[0] >> 7)
+        print("Calib")
+        c = line[1]
+        print(str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03))
+
+        print("Button")
+        print(line[0] >> 4 & 0x7)
+
+        print("Accel")
+        ax = (line[0] & 0xf) << 8 | line[1]
+        if (ax & 0x800): ax = -1*int((ax ^ 0xfff) + 1)
+        ax = ax/100
+        print(ax)
+        ay = line[2] << 4 | (line[3] >> 8)
+        if (ay & 0x800): ay = -1*int((ay ^ 0xfff) + 1)
+        ay = ay/100
+        print(ay)
+        az = (line[3] & 0xf) << 8 | line[4]
+        if (az & 0x800): az = -1*int((az ^ 0xfff) + 1)
+        az = az/100
+        print(az)
+
+        print("Euler")
+        ex = line[5] << 8 | line[6]
+        ex = int(ex)/100
+        print(ex)
+        ey = line[7] << 8 | line[8]
+        if (ey & 0x8000): ey = -1*int((ey ^ 0xffff) + 1)
+        ey = int(ey)/100
+        print(ey)
+        ez = line[9] << 8 | line[10]
+        if (ez & 0x8000): ez = -1*int((ez ^ 0xffff) + 1)
+        ez = int(ez)/100
+        print(ez)
+
+        print("Timer")
+        print(line[11])
+        print("End\n")
         
         count = count + 1
 
@@ -130,7 +149,7 @@ def run():
 
     cur_idx = cur_idx + CHUNKS 
     
-    if (cur_idx >= 700):
+    if (cur_idx >= 10000):
       break
     
 

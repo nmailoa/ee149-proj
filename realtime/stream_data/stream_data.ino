@@ -45,7 +45,17 @@ boolean button = 0;
 boolean sync = 0;
 int do_loop = 0;
 //boolean debug = 0;
-long count = 0;
+byte count = 0;
+byte cur_count = 0;
+
+char buff[60] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int reading_no = 0;
+int ax = 0;
+int ay = 0;
+int az = 0;
+int ex = 0;
+int ey = 0;
+int ez = 0;
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -62,6 +72,8 @@ void setup(void)
 {
   sync = 0;
   do_loop = 0;
+  reading_no = 0;
+  count = 0;
   
   pinMode(6, INPUT);
   pinMode(LED, OUTPUT);
@@ -101,15 +113,15 @@ void setup(void)
   delay(1000);
 
   /* Display the current temperature */
-  int8_t temp = bno.getTemp();
+  /*int8_t temp = bno.getTemp();
   Serial.print("Current Temperature: ");
   Serial.print(temp);
   Serial.println(" C");
-  Serial.println("");
+  Serial.println("");*/
 
   bno.setExtCrystalUse(true);
 
-  Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
+  //Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
   //sendCalibration();
   
 }
@@ -137,61 +149,68 @@ void loop(void)
   
   if (do_loop){
   //time = millis();
-  bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
-  imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  button = digitalRead(6);
-  
-  Serial.print(sys, DEC);
-  Serial.print(accelCal, DEC);
-  Serial.print(gyroCal, DEC);
-  Serial.print(magCal, DEC);
-  Serial.print(",");
-  //Serial.print('\t'); 
+    cur_count = count;
+    bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
+    imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+    imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+    button = digitalRead(6);
 
-  if (sync == 0)
-    Serial.print('\n');
-  if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
-    sync = 1;
-    digitalWrite(13, HIGH);
-    while (Serial.read() != '1');
-    digitalWrite(13, LOW);
-    Serial.print("3333,");
-  }
-  
-  if (sync){
+    if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
+      buff[12*reading_no] = char(1 << 7);
+      buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
+      buff[12*reading_no+11] = char(cur_count);
+      
+      Serial.write((const unsigned char*)buff, 60);
+      Serial.flush();
+      reading_no = 0;
+      
+      digitalWrite(LED, HIGH);
+      while (Serial.read() != '1');
+      sync = 1;
+      digitalWrite(LED, LOW);
+    }
+    else {
+      if (sync == 0){
+        buff[12*reading_no] = char(1 << 7);
+        buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
+        buff[12*reading_no+11] = char(cur_count);
+      }
+      else {
+        ax = int(accel.x()*100);
+        //if (ax < 0) ax = abs(ax) | 0x800;
+        //ax = ax & 0xfff;
+        ay = int(accel.y()*100);
+        //if (ay < 0) ax = abs(ay) | 0x800;
+        //ay = ay & 0xfff;
+        az = int(accel.z()*100);
+        //if (az < 0) az = abs(az) | 0x800;
+        //az = az & 0xfff;
 
-  /* Display the floating point data */
-  Serial.print(accel.x(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-  Serial.print(accel.y(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-  Serial.print(accel.z(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-
-  /* Display the floating point data */
-  Serial.print(euler.x(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-  Serial.print(euler.y(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-  Serial.print(euler.z(), 2);
-  Serial.print(",");
-  //Serial.print('\t');
-
-  Serial.print(button);
-  Serial.print(",");
-  //Serial.print('\t');
-  
-  
-  Serial.print(count);//time);
-  Serial.print("\n");
-  }
-  do_loop = 0;
+        ex = int(euler.x()*100);
+        ey = int(euler.y()*100);
+        ez = int(euler.z()*100);
+        
+        buff[12*reading_no] = char(1 << 7 | button << 4 | ax >> 8);
+        buff[12*reading_no+1] = char(ax & 0xff);
+        buff[12*reading_no+2] = char(ay >> 4);
+        buff[12*reading_no+3] = char((ay & 0xf) << 4 | (az >> 8) & 0xf);
+        buff[12*reading_no+4] = char(az & 0xff);
+        buff[12*reading_no+5] = char(ex >> 8);
+        buff[12*reading_no+6] = char(ex & 0xff);
+        buff[12*reading_no+7] = char(ey >> 8);
+        buff[12*reading_no+8] = char(ey & 0xff);
+        buff[12*reading_no+9] = char(ez >> 8);
+        buff[12*reading_no+10] = char(ez & 0xff);
+        buff[12*reading_no+11] = char(cur_count);
+      }
+      reading_no++;
+      if (reading_no > 4) {
+        Serial.write((const unsigned char*)buff, 60);
+        reading_no = 0;
+      }
+    }
+    
+    do_loop = 0;
   }
   /*
   // Quaternion data
