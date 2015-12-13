@@ -108,16 +108,6 @@ def run():
     except:
       pass
 
-<<<<<<< HEAD
-=======
-  # plt.ion()
-  # fig = plt.figure()
-  # figA = fig.add_subplot(111, projection = "3d")
-  # figA.set_xlabel('x')
-  # figA.set_ylabel('y')
-  # figA.set_zlabel('z')
-
->>>>>>> 5f8f825a0c8d5d531727e583659e4be9ae4f9f15
   print("Recording in 3...")
   time.sleep(1)
   print("2...")

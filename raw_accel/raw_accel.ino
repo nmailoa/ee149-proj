@@ -52,6 +52,7 @@ void setup(void)
 {
   pinMode(6, INPUT);
   pinMode(LED, OUTPUT);
+  pinMode(5, OUTPUT);
   
   Serial.begin(57600);
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
@@ -104,7 +105,8 @@ void loop(void)
   imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
   button = digitalRead(6);
-  
+
+  digitalWrite(5, HIGH);
   Serial.print(system, DEC);
   Serial.print(accelCal, DEC);
   Serial.print(gyroCal, DEC);
@@ -141,6 +143,7 @@ void loop(void)
   
   Serial.print(time);
   Serial.print("\n");
+  digitalWrite(5, LOW);
 
   /*
   // Quaternion data
