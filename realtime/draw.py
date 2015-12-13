@@ -256,7 +256,7 @@ def run():
         v_anchor = np.array([1])
         continue
 
-      timestep = (t[i] - t[i-1])
+      timestep = (t[i] - t[i-1])*15/1000
 
       # update velocity
       #vx[i+1] = vx[i] + ax[i]*timestep
@@ -310,6 +310,7 @@ def run():
 
 
           for j in range(i - last_v_anchor+2):
+            timestep = (t[j+last_v_anchor] - t[j+last_v_anchor-1])*15/1000
             vx[j+last_v_anchor-1] = vx[j+last_v_anchor-1] - j/(i-last_v_anchor)*vx[i]
             vy[j+last_v_anchor-1] = vy[j+last_v_anchor-1] - j/(i-last_v_anchor)*vy[i]
             vz[j+last_v_anchor-1] = vz[j+last_v_anchor-1] - j/(i-last_v_anchor)*vz[i]
