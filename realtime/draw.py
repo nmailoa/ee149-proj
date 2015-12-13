@@ -134,6 +134,7 @@ def run():
   for i in range(20):
     line = ser.read(12)
 
+  base_time = 0
   while(True):
     print(cur_idx)
     ex = np.zeros(CHUNKS)
@@ -143,7 +144,6 @@ def run():
     tay = np.zeros(CHUNKS)
     taz = np.zeros(CHUNKS)
     count = 0
-    crossed_zero = False
     while count < CHUNKS:
       if (failcount > 20):
         print("Failed more than 20 times")
@@ -185,7 +185,9 @@ def run():
 
         timetemp = int(line[11])
         #if (t.size != 0 and timetemp < t[-1]): timetemp = t[-1] + timetemp
-        if timetemp - t[-1]
+        if timetemp - t[-1] < 0:
+          base_time = base_time + 255
+        timetemp = timetemp + base_time
         # Get rid of mean and threshold
 
         temp = float(axt)
