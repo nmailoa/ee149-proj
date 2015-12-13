@@ -21,6 +21,7 @@
 #define BNO055_SAMPLERATE_DELAY_MS (10)
 
 #define LED (13)
+#define FORCE_SENSOR (1)
 
 int calibrated = 0;
 
@@ -56,6 +57,7 @@ int az = 0;
 int ex = 0;
 int ey = 0;
 int ez = 0;
+boolean force = 0;
 
 imu::Vector<3> accel;
 imu::Vector<3> euler;
@@ -76,6 +78,9 @@ else debug = 1;
 /**************************************************************************/
 void setup(void)
 {
+  Bean.setLed(255,0,0);
+
+  
   sync = 0;
   do_loop = 0;
   reading_no = 0;
@@ -83,7 +88,8 @@ void setup(void)
   
   pinMode(0, INPUT);
   pinMode(LED, OUTPUT);
-  pinMode(5, OUTPUT);
+  pinMode(3, INPUT);
+  pinMode(FORCE_SENSOR, INPUT);
 
   //pinMode(12, OUTPUT);
   cli();          // disable global interrupts
@@ -160,21 +166,28 @@ void loop(void)
     bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
     accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
     euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    button = digitalRead(0);
+    force = digitalRead(FORCE_SENSOR);
+    button = digitalRead(0) | (force << 1);
+
+    gyroCal = 3; // DEBUG
 
     if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
-      buff[12*reading_no] = char(1 << 7);
-      buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
-      buff[12*reading_no+11] = char(cur_count);
+      buff[0] = char(1 << 7);
+      buff[1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
+      buff[11] = char(cur_count);
       
-      Serial.write((const unsigned char*)buff, 60);
+      Serial.write((const unsigned char*)buff, 12);
       Serial.flush();
       reading_no = 0;
       
-      digitalWrite(LED, HIGH);
       while (Serial.read() != '1');
+
+      Bean.setLed(0,0,255);
+      while (digitalRead(3) != 1);
+      while (digitalRead(3) != 0);
+      Bean.setLed(0,255,0);
+      
       sync = 1;
-      digitalWrite(LED, LOW);
     }
     else {
       if (sync == 0){
@@ -210,12 +223,16 @@ void loop(void)
         buff[12*reading_no+9] = char(ez >> 8);
         buff[12*reading_no+10] = char(ez & 0xff);
         buff[12*reading_no+11] = char(cur_count);
+        
+        if(force) Bean.setLed(255, 255, 0);
+        else Bean.setLed(0,255, 0);
       }
       reading_no++;
       if (reading_no > 4) {
         Serial.write((const unsigned char*)buff, 60);
         reading_no = 0;
       }
+      
     }
     
     do_loop = 0;
@@ -268,12 +285,6 @@ void loop(void)
   /*if (accelCal < 2) {
     sendCalibration();
   }*/
-  
-  if(button){
-    digitalWrite(LED, HIGH);
-  } else {
-    digitalWrite(LED, LOW);
-  }
 
   //delay(BNO055_SAMPLERATE_DELAY_MS);
 }

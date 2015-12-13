@@ -22,6 +22,10 @@ y = np.array([])
 z = np.array([])
 t = np.array([])
 v_anchor = np.array([])
+tipx = np.array([])
+tipy = np.array([])
+forceSensor = np.array([])
+len_pen = 0.1
 
 CHUNKS = 20
 
@@ -56,7 +60,7 @@ def serial_ports():
 
 
 def run():
-  global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor
+  global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor,tipx,tipy,forceSensor
   print("reWRITE Position Reconstruction")
 
   ports = serial_ports()
@@ -72,10 +76,7 @@ def run():
   portNo = input("Select the port to use: ")
   ser = serial.Serial(ports[int(portNo)-1])
   ser.baudrate=57600 
-  ser.timeout=1
-  ser.write("5".encode())
-  ser.readline()
-  ser.timeout=5
+  ser.timeout=10
 
   cur_idx = 0
   mean_x = 0
@@ -93,7 +94,7 @@ def run():
   ser.flush()
   failcount = 0
 
-  calibrated = 0
+  calibrated = 1 #0
   while(calibrated != 1):
     try:
       """
@@ -104,7 +105,7 @@ def run():
       line = (ser.read(12))
       c = line[1]
       print(str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03))
-      if (c & 0x3f == 0x03f): calibrated == 1
+      if ((c & 0x3f) == 0x3f): calibrated = 1
     except:
       pass
 
@@ -131,7 +132,7 @@ def run():
   
   #Throw away first 20
   for i in range(20):
-    line = ser.readline()
+    line = ser.read(12)
 
   while(True):
     print(cur_idx)
@@ -142,6 +143,7 @@ def run():
     tay = np.zeros(CHUNKS)
     taz = np.zeros(CHUNKS)
     count = 0
+    crossed_zero = False
     while count < CHUNKS:
       if (failcount > 20):
         print("Failed more than 20 times")
@@ -156,66 +158,72 @@ def run():
 
         line = (ser.read(12))
 
-        ax = (line[0] & 0xf) << 8 | line[1]
-        if (ax & 0x800): ax = -1*int((ax ^ 0xfff) + 1)
-        ax = ax/100
+        force = (line[0] >> 5) & 0x1;
 
-        ay = line[2] << 4 | (line[3] >> 8)
-        if (ay & 0x800): ay = -1*int((ay ^ 0xfff) + 1)
-        ay = ay/100
+        axt = (line[0] & 0xf) << 8 | line[1]
+        if (axt & 0x800): axt = -1*int((axt ^ 0xfff) + 1)
+        axt = axt/100
 
-        az = (line[3] & 0xf) << 8 | line[4]
-        if (az & 0x800): az = -1*int((az ^ 0xfff) + 1)
-        az = az/100
+        ayt = line[2] << 4 | (line[3] >> 8)
+        if (ayt & 0x800): ayt = -1*int((ayt ^ 0xfff) + 1)
+        ayt = ayt/100
 
-        ez = line[5] << 8 | line[6]
-        ez = int(ez)/100
+        azt = (line[3] & 0xf) << 8 | line[4]
+        if (azt & 0x800): azt = -1*int((azt ^ 0xfff) + 1)
+        azt = azt/100
 
-        ey = line[7] << 8 | line[8]
-        if (ey & 0x8000): ey = -1*int((ey ^ 0xffff) + 1)
-        ey = int(ey)/100
+        ezt = line[5] << 8 | line[6]
+        ezt = int(ezt)/100
 
-        ex = line[9] << 8 | line[10]
-        if (ex & 0x8000): ex = -1*int((ex ^ 0xffff) + 1)
-        ex = int(ex)/100
+        eyt = line[7] << 8 | line[8]
+        if (eyt & 0x8000): eyt = -1*int((eyt ^ 0xffff) + 1)
+        eyt = int(eyt)/100
 
-        time = int(line[11])*15/1000
-        if (time < t[-1]): time = t[-1] + time
+        ext = line[9] << 8 | line[10]
+        if (ext & 0x8000): ext = -1*int((ext ^ 0xffff) + 1)
+        ext = int(ext)/100
 
+        timetemp = int(line[11])
+        #if (t.size != 0 and timetemp < t[-1]): timetemp = t[-1] + timetemp
+        if timetemp - t[-1]
         # Get rid of mean and threshold
 
-        temp = float(ax)
+        temp = float(axt)
         mean_x = mean_x * 0.999 + temp * 0.001
         temp = temp - mean_x if abs(temp-mean_x) > 0.15 else 0
         last_ax = last_ax*alpha + temp*(1-alpha)
         tax[count] = last_ax
 
-        temp = float(ay)
+        temp = float(ayt)
         mean_y = mean_y * 0.999 + temp * 0.001
         temp = temp - mean_y if abs(temp-mean_y) > 0.15 else 0
         last_ay = last_ay*alpha + temp*(1-alpha)
         tay[count] = last_ay
 
-        temp = float(az)
+        temp = float(azt)
         mean_z = mean_z * 0.999 + temp * 0.001
         temp = temp - mean_z if abs(temp-mean_z) > 0.15 else 0
         last_az = last_az*alpha + temp*(1-alpha)
         taz[count] = last_az
 
+        print(str(last_ax) + '\t' + str(last_ay) + '\t' + str(last_az) + '\t' + str(timetemp) + '\t' + str(force))
+
         if (cur_idx == 0 and count == 0):
           ex[count] = 0
           ey[count] = 0
           ez[count] = 0
-          base_ez = ez
-          base_ey = ey
-          base_ex = ex
+          base_ez = ezt
+          base_ey = eyt
+          base_ex = ext
         else:
-          ez[count] = -(ez - base_ez)/360*2*math.pi
-          ey[count] = (ey - base_ey)/360*2*math.pi
-          ex[count] = (ex - base_ex)/360*2*math.pi
+          ez[count] = -(ezt - base_ez)/360*2*math.pi
+          ey[count] = (eyt - base_ey)/360*2*math.pi
+          ex[count] = (ext - base_ex)/360*2*math.pi
 
         
-        t = np.append(t, time)
+        t = np.append(t, timetemp)
+        forceSensor = np.append(forceSensor, force)
+
         count = count + 1
 
       except:
@@ -273,9 +281,32 @@ def run():
       # calibrate vel if more than half a second w no accel
       v_anchor = np.append(v_anchor, [0])
       if (last_zero != 0 and (t[i] - last_zero) > 0.3):
+
         last_v_anchor = [j for j, e in enumerate(v_anchor) if e != 0]
         last_v_anchor = last_v_anchor[-1]
         if (i != last_v_anchor):
+          """
+          posx = sum([x for x in ax[last_v_anchor:i] if x > 0])
+          negx = sum([x for x in ax[last_v_anchor:i] if x < 0])
+          if(posx>0 and negx>0):
+            ax[last_v_anchor:i] = [x*(posx+negx)/2/posx if x > 0 else x*(posx+negx)/2/negx for x in ax[last_v_anchor:i]]
+          posy = sum([x for x in ay[last_v_anchor:i] if x > 0])
+          negy = sum([x for x in ay[last_v_anchor:i] if x < 0])
+          if(posy>0 and negy>0):
+            ay[last_v_anchor:i] = [x*(posy+negy)/2/posy if x > 0 else x*(posy+negy)/2/posy for x in ay[last_v_anchor:i]]
+          posz = sum([x for x in az[last_v_anchor:i] if x > 0])
+          negz = sum([x for x in az[last_v_anchor:i] if x < 0])
+          if(posz>0 and negz>0):
+            az[last_v_anchor:i] = [x*(posz+negz)/2/posz if x > 0 else x*(posz+negz)/2/posz for x in az[last_v_anchor:i]]
+
+          for j in range(i - last_v_anchor+1):
+            timestep = (t[j+last_v_anchor-1] - t[j+last_v_anchor])
+            vx[j+last_v_anchor] = vx[j+last_v_anchor-1]+ax[j+last_v_anchor-1]*timestep
+            vy[j+last_v_anchor] = vy[j+last_v_anchor-1]+ay[j+last_v_anchor-1]*timestep
+            vz[j+last_v_anchor] = vz[j+last_v_anchor-1]+az[j+last_v_anchor-1]*timestep
+          """
+
+
           for j in range(i - last_v_anchor+2):
             vx[j+last_v_anchor-1] = vx[j+last_v_anchor-1] - j/(i-last_v_anchor)*vx[i]
             vy[j+last_v_anchor-1] = vy[j+last_v_anchor-1] - j/(i-last_v_anchor)*vy[i]
@@ -290,20 +321,32 @@ def run():
         last_zero = t[i]
         v_anchor[i-1] = 1
 
-
-
-    cur_idx = cur_idx + CHUNKS 
     
-    if (cur_idx >= 5000):
+    if (cur_idx >= 10000):
       print(time.time() - t0)
       break
     
-    m = max(max(abs(x)), max(abs(y)))
+    tipx = np.append(tipx, x[cur_idx:] - len_pen*sey)
+    tipy = np.append(tipy, y[cur_idx:] - len_pen*sex)
+
+    #m = max(max(abs(tipx)), max(abs(tipy)))
+    m = 10000
     figA.set_xlim([-m, m])
     figA.set_ylim([-m, m])
     figA.cla()
-    figA.plot(x,y)
+    starts = np.where(forceSensor[1:] - forceSensor[:-1] == 1)[0]
+    ends = np.where(forceSensor[1:] - forceSensor[:-1] == -1)[0]
+    print(starts)
+    for a,j in enumerate(starts):
+      if (a != len(starts) - 1 and j - ends[a] < 10):
+        pass
+      if a == len(starts) - 1:
+        figA.plot(tipx[j:],tipy[j:])
+      else:
+        figA.plot(tipx[j:ends[a]],tipy[j:ends[a]])
     fig.canvas.draw()
+
+    cur_idx = cur_idx + CHUNKS 
         
   plt.show()
 
