@@ -185,9 +185,9 @@ def run():
 
         timetemp = int(line[11])
         #if (t.size != 0 and timetemp < t[-1]): timetemp = t[-1] + timetemp
-        if timetemp - t[-1] < 0:
-          base_time = base_time + 255
-        timetemp = timetemp + base_time
+        #if timetemp - t[-1] < 0:
+        #  base_time = base_time + 255
+        #timetemp = timetemp + base_time
         # Get rid of mean and threshold
 
         temp = float(axt)

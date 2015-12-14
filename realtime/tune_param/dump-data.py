@@ -9,19 +9,8 @@ import time
 import re
 import os
 from numpy import genfromtxt
+import pickle
 
-
-ax = np.array([])
-ay = np.array([])
-az = np.array([])
-vx = np.array([])
-vy = np.array([])
-vz = np.array([])
-x = np.array([])
-y = np.array([])
-z = np.array([])
-t = np.array([])
-v_anchor = np.array([])
 
 CHUNKS = 20
 
@@ -56,7 +45,7 @@ def serial_ports():
 
 
 def run():
-  global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor
+  global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor,tipx,tipy,forceSensor
   print("reWRITE Position Reconstruction")
 
   ports = serial_ports()
@@ -72,9 +61,7 @@ def run():
   portNo = input("Select the port to use: ")
   ser = serial.Serial(ports[int(portNo)-1])
   ser.baudrate=57600 
-  ser.timeout=1
-  ser.write("5".encode())
-  ser.timeout=5
+  ser.timeout=10
 
   cur_idx = 0
   mean_x = 0
@@ -91,56 +78,48 @@ def run():
 
   ser.flush()
   failcount = 0
-
-
-  #dump_file = open('dump', 'w')
-  print("V\tCal\tBut\tAccel\t\t\tEuler\t\t\tTimer")
   
-  while(True):
+  print("Recording in 3...")
+  time.sleep(1)
+  print("2...")
+  time.sleep(1)
+  print("1...")
+  time.sleep(1)
+  print("Start")
+  ser.write('1'.encode())
+  ser.flushInput()
+
+
+  if(len(sys.argv) != 2):
+    print("Usage: dump-data.py filename")
+    exit()
+
+  data_file = open(sys.argv[1], 'wb+')
+  data = []
+  
+  #Throw away first 20
+
+  base_time = 0
+  while(cur_idx < 350):
+    print(cur_idx)
     count = 0
     while count < CHUNKS:
       if (failcount > 20):
-        break
+        print("Failed more than 20 times")
+        exit()
       try:
         line = (ser.read(12))
-        c = line[1]
-        ax = (line[0] & 0xf) << 8 | line[1]
-        if (ax & 0x800): ax = -1*int((ax ^ 0xfff) + 1)
-        ax = ax/100
-        ay = line[2] << 4 | (line[3] >> 8)
-        if (ay & 0x800): ay = -1*int((ay ^ 0xfff) + 1)
-        ay = ay/100
-        az = (line[3] & 0xf) << 8 | line[4]
-        if (az & 0x800): az = -1*int((az ^ 0xfff) + 1)
-        az = az/100
-        ex = line[5] << 8 | line[6]
-        ex = int(ex)/100
-        ey = line[7] << 8 | line[8]
-        if (ey & 0x8000): ey = -1*int((ey ^ 0xffff) + 1)
-        ey = int(ey)/100
-        ez = line[9] << 8 | line[10]
-        if (ez & 0x8000): ez = -1*int((ez ^ 0xffff) + 1)
-        ez = int(ez)/100
-
-        print(str(line[0] >> 7) + '\t' + \
-              str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03) + '\t' + \
-        str(line[0] >> 4 & 0x7) + '\t' + \
-        str(ax) + '\t' + str(ay) + '\t' + str(az) + '\t' + \
-        str(ex) + '\t' + str(ey) + '\t' + str(ez) + '\t' + \
-        str(line[11]))
-        
         count = count + 1
-
+        data.append(line)
       except:
         failcount = failcount + 1
         pass
 
+   
+    
     cur_idx = cur_idx + CHUNKS 
-    
-    if (cur_idx >= 1000):
-      break
-    
+        
+  pickle.dump(data, data_file)
 
 run()
-
 

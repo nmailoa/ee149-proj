@@ -64,11 +64,11 @@ imu::Vector<3> euler;
 
 ISR(TIMER1_COMPA_vect)
 {
-digitalWrite(5, debug);
+//digitalWrite(5, debug);
 do_loop = 1;
 count++;
-if (debug) debug = 0;
-else debug = 1;
+//if (debug) debug = 0;
+//else debug = 1;
 }
 
 /**************************************************************************/
@@ -90,6 +90,7 @@ void setup(void)
   pinMode(LED, OUTPUT);
   pinMode(3, INPUT);
   pinMode(FORCE_SENSOR, INPUT);
+  pinMode(4, OUTPUT);
 
   //pinMode(12, OUTPUT);
   cli();          // disable global interrupts
@@ -124,13 +125,6 @@ void setup(void)
   }
 
   delay(1000);
-
-  /* Display the current temperature */
-  /*int8_t temp = bno.getTemp();
-  Serial.print("Current Temperature: ");
-  Serial.print(temp);
-  Serial.println(" C");
-  Serial.println("");*/
 
   bno.setExtCrystalUse(true);
 
@@ -169,7 +163,7 @@ void loop(void)
     force = digitalRead(FORCE_SENSOR);
     button = digitalRead(0) | (force << 1);
 
-    gyroCal = 3; // DEBUG
+    //gyroCal = 3; // DEBUG
 
     if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
       buff[0] = char(1 << 7);
@@ -178,6 +172,7 @@ void loop(void)
       
       Serial.write((const unsigned char*)buff, 12);
       Serial.flush();
+      Bean.setLed(246, 255, 0);
       reading_no = 0;
       
       while (Serial.read() != '1');
@@ -194,8 +189,17 @@ void loop(void)
         buff[12*reading_no] = char(1 << 7);
         buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
         buff[12*reading_no+11] = char(cur_count);
+        if (gyroCal == 3 && magCal == 3){
+          if (accelCal == 0) 
+          if (accelCal == 1) Bean.setLed(73,243,243);
+          if (accelCal == 2) Bean.setLed(242,189,73);
+        }
+          
       }
       else {
+
+        digitalWrite(4, HIGH);
+        
         ax = int(accel.x()*100);
         //if (ax < 0) ax = abs(ax) | 0x800;
         //ax = ax & 0xfff;
@@ -224,8 +228,10 @@ void loop(void)
         buff[12*reading_no+10] = char(ez & 0xff);
         buff[12*reading_no+11] = char(cur_count);
         
-        if(force) Bean.setLed(255, 255, 0);
-        else Bean.setLed(0,255, 0);
+        //if(force) Bean.setLed(255, 255, 0);
+        //else Bean.setLed(0,255, 0);
+
+        digitalWrite(4, LOW);
       }
       reading_no++;
       if (reading_no > 4) {
@@ -237,50 +243,6 @@ void loop(void)
     
     do_loop = 0;
   }
-  /*
-  // Quaternion data
-  imu::Quaternion quat = bno.getQuat();
-  Serial.print("qW: ");
-  Serial.print(quat.w(), 4);
-  Serial.print(" qX: ");
-  Serial.print(quat.y(), 4);
-  Serial.print(" qY: ");
-  Serial.print(quat.x(), 4);
-  Serial.print(" qZ: ");
-  Serial.print(quat.z(), 4);
-  Serial.print("\t\t");
-  */
-
-
-  
-  
-  
-  /*if (gyroCal == 3 && accelCal == 3 && magCal == 3 && calibrated == 0){
-    saveCalibration();
-    calibrated = 1;
-    Serial.print(accel_offset_x);
-    Serial.print(",");
-    Serial.print(accel_offset_y);
-    Serial.print(",");
-    Serial.print(accel_offset_z);
-    Serial.print(",");
-    Serial.print(gyro_offset_x);
-    Serial.print(",");
-    Serial.print(gyro_offset_y);
-    Serial.print(",");
-    Serial.print(gyro_offset_z);
-    Serial.print(",");
-    Serial.print(mag_offset_x);
-    Serial.print(",");
-    Serial.print(mag_offset_y);
-    Serial.print(",");
-    Serial.print(mag_offset_z);
-    Serial.print(",");
-    Serial.print(accel_radius);
-    Serial.print(",");
-    Serial.print(mag_radius);
-    Serial.print("\n");
-  } */
   
   /*if (accelCal < 2) {
     sendCalibration();
