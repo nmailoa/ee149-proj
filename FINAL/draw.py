@@ -209,7 +209,7 @@ def run():
         last_az = last_az*lpf_alpha + temp*(1-lpf_alpha)
         taz[count] = last_az if abs(last_az) > accel_thres/3 else 0
 
-        print('\t' + str(timetemp) + '\t' + str(force) + '\t' + str(button))
+        #print('\t' + str(timetemp) + '\t' + str(force) + '\t' + str(button))
 
         if (cur_idx == 0 and count == 0):
           ex[count] = 0
