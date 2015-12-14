@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import math
 import sys
 import serial
@@ -8,9 +7,9 @@ import glob
 import time
 import re
 import os
-from numpy import genfromtxt
 
 
+# Data arrays
 ax = np.array([])
 ay = np.array([])
 az = np.array([])
@@ -24,13 +23,16 @@ t = np.array([])
 tipx = np.array([])
 tipy = np.array([])
 forceSensor = np.array([])
+
+# Constant parameters
 len_pen = 0.1
 accel_thres = 0.15
 accel_time_lim = 0.1
+scale_factor = [10/9.5, 10/7.5]
 
+# Number of readings per processing loop
 CHUNKS = 20
 
-scale_factor = [10/9.5, 10/7.5]
 
 def serial_ports():
   """Lists serial ports
@@ -65,6 +67,7 @@ def run():
   global ax,ay,az,vx,vy,vz,x,y,z,t,v_anchor,tipx,tipy,forceSensor
   print("reWRITE Position Reconstruction")
 
+  # Connect to serial port
   ports = serial_ports()
   if ports:
     print("Available serial ports:")
@@ -74,37 +77,45 @@ def run():
     print("No ports available. Check serial connection and try again.")
     print("Exiting...")
     return
-
   portNo = input("Select the port to use: ")
   ser = serial.Serial(ports[int(portNo)-1])
   ser.baudrate=57600 
   ser.timeout=10
 
+  # Reset variables
   cur_idx = 0
   mean_x = 0
   mean_y = 0
   mean_z = 0
-  lpf_alpha = 0.9
-  hpf_alpha = 0.99
-  cal_pow = 2
   last_ax = 0
   last_ay = 0
   last_az = 0
-  last_zero = [1,1,1]
-  first_nonzero = [0,0,0]
-  last_forceOn = -1
   base_ex = 0
   base_ey = 0
   base_ez = 0
+  base_time = 0
+
+  # Calibration constants
+  last_zero = [1,1,1]
+  first_nonzero = [0,0,0]
+  last_forceOn = -1
+  lpf_alpha = 0.9
+  hpf_alpha = 0.99
+  cal_pow = 2
   failcount = 0
 
   ser.flush()
 
-  calibrated = 1 #0
+  # Calibration stage
+  calibrated = 0
+  if (sys.argv[2] == 'c'):
+    calibrated = 1
+
   while(calibrated != 1):
     try:
       line = (ser.read(12))
       c = line[1]
+      # Print calibration status
       print(str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03))
       if ((c & 0x3f) == 0x3f): calibrated = 1
     except:
@@ -121,22 +132,18 @@ def run():
   ser.flushInput()
   print(ser.inWaiting())
 
-  #Throw away first 20
-
-  data_file = open('data', 'w')
+  # Start plot
   plt.ion()
   fig = plt.figure()
-  #figA = fig.add_subplot(111, projection = "3d")
   figA = fig.add_subplot(111)
   figA.set_xlabel('x')
   figA.set_ylabel('y')  
 
-  #Throw away first 20
+  # Throw away first 20 data points
   for i in range(20):
     line = ser.read(12)
 
-
-  base_time = 0
+  # Main loop
   while(True):
     print(cur_idx)
     ex = np.zeros(CHUNKS)
@@ -146,6 +153,8 @@ def run():
     tay = np.zeros(CHUNKS)
     taz = np.zeros(CHUNKS)
     count = 0
+
+    # Populate 20 data points
     while count < CHUNKS:
       if (failcount > 20):
         print("Failed more than 20 times")
@@ -153,9 +162,11 @@ def run():
       try:
         line = ser.read(12) 
 
+        # Populate force sensor and button data
         force = (line[0] >> 5) & 0x1;
         button = (line[0] >> 4) & 0x1;
 
+        # Populate acceleration data
         axt = (line[0] & 0xf) << 8 | line[1]
         if (axt & 0x800): axt = -1*int((axt ^ 0xfff) + 1)
         axt = axt/100
@@ -168,6 +179,7 @@ def run():
         if (azt & 0x800): azt = -1*int((azt ^ 0xfff) + 1)
         azt = azt/100
 
+        # Populate Euler angle data
         ezt = line[5] << 8 | line[6]
         ezt = int(ezt)/100
 
@@ -179,12 +191,13 @@ def run():
         if (ext & 0x8000): ext = -1*int((ext ^ 0xffff) + 1)
         ext = int(ext)/100
 
+        # Populate timestamp data
         timetemp = int(line[11])
         if t != [] and timetemp+base_time - t[-1] < 0:
           base_time = base_time + 256
         timetemp = timetemp + base_time
-        # Get rid of mean and threshold
 
+        # Acceleration high-pass, low-pass and thresholding
         temp = float(axt)
         if (cur_idx == 0 and count == 0):
           mean_x = temp
@@ -209,8 +222,7 @@ def run():
         last_az = last_az*lpf_alpha + temp*(1-lpf_alpha)
         taz[count] = last_az if abs(last_az) > accel_thres/3 else 0
 
-        #print('\t' + str(timetemp) + '\t' + str(force) + '\t' + str(button))
-
+        # Convert Euler angles to deltas in radians
         if (cur_idx == 0 and count == 0):
           ex[count] = 0
           ey[count] = 0
@@ -223,10 +235,11 @@ def run():
           ey[count] = (eyt - base_ey)/360*2*math.pi
           ex[count] = (ext - base_ex)/360*2*math.pi
 
-        
+        # Save timestamp and force sensor data
         t = np.append(t, timetemp)
         forceSensor = np.append(forceSensor, force)
 
+        # If button is pressed, clear figure
         if(button):
           figA.cla()
 
@@ -236,7 +249,7 @@ def run():
         failcount = failcount + 1
         pass
 
-   
+    # Convert IMU frame of reference to real coordinates
     sex = np.sin(ex)
     sey = np.sin(ey)
     sez = np.sin(ez)
@@ -244,11 +257,11 @@ def run():
     cey = np.cos(ey)
     cez = np.cos(ez)
 
-    # Convert to real coordinates
     ax = np.append(ax, cey*cez*tax + (sex*sey*cez - cex*sez)*tay + (cex*sey*cez + sex*sez)*taz)
     ay = np.append(ay, cey*sez*tax + (sex*sey*sez + cex*cez)*tay + (cex*sey*sez - sex*cez)*taz)
     az = np.append(az, -sey*tax + sex*cey*tay + cex*cey*taz)
 
+    # Process absolute acceleration data
     for i in range(cur_idx, cur_idx+CHUNKS):
       if (i == 0):
         vx = np.array([0])
@@ -262,16 +275,17 @@ def run():
 
       timestep = (t[i] - t[i-1])*15/1000
 
-      # update velocity
+      # Update velocity
       vx = np.append(vx, vx[i-1]+ax[i-1]*timestep)
       vy = np.append(vy, vy[i-1]+ay[i-1]*timestep)
       vz = np.append(vz, vz[i-1]+az[i-1]*timestep)
 
-      # update position
+      # Update position
       x = np.append(x, x[i-1]+vx[i-1]*timestep)
       y = np.append(y, y[i-1]+vy[i-1]*timestep)
       z = np.append(z, z[i-1]+vz[i-1]*timestep)
 
+      # Calibrate x velocity if more than accel_time_lim with no x accel
       if (abs(ax[i]) <= accel_thres):
         if first_nonzero[0] != -1 and last_zero[0] == -1:
           last_zero[0] = i   
@@ -280,7 +294,6 @@ def run():
         if first_nonzero[0] == -1:
           first_nonzero[0] = i   
 
-      # calibrate vel if more than half a second w no accel
       if (last_zero[0] != -1 and (t[i] - t[last_zero[0]]) > accel_time_lim*1000/15):
         for j in range(first_nonzero[0], last_zero[0]+1):
           timestep = (t[j] - t[j-1])*15/1000
@@ -293,8 +306,7 @@ def run():
         last_zero[0] = -1
 
 
-
-
+      # Calibrate y velocity if more than accel_time_lim with no y accel
       if (abs(ay[i]) <= accel_thres):
         if first_nonzero[1] != -1 and last_zero[1] == -1:
           last_zero[1] = i   
@@ -303,7 +315,6 @@ def run():
         if first_nonzero[1] == -1:
           first_nonzero[1] = i   
 
-      # calibrate vel if more than half a second w no accel
       if (last_zero[1] != -1 and (t[i] - t[last_zero[1]]) > accel_time_lim*1000/15):
         for j in range(first_nonzero[1], last_zero[1]+1):
           timestep = (t[j] - t[j-1])*15/1000
@@ -316,8 +327,7 @@ def run():
         last_zero[1] = -1
 
 
-
-
+      # Calibrate z velocity if more than accel_time_lim with no z accel
       if (abs(az[i]) <= accel_thres):
         if first_nonzero[2] != -1 and last_zero[2] == -1:
           last_zero[2] = i   
@@ -326,7 +336,6 @@ def run():
         if first_nonzero[2] == -1:
           first_nonzero[2] = i   
 
-      # calibrate vel if more than half a second w no accel
       if (last_zero[2] != -1 and (t[i] - t[last_zero[2]]) > accel_time_lim*1000/15):
         for j in range(first_nonzero[2], last_zero[2]+1):
           timestep = (t[j] - t[j-1])*15/1000
@@ -338,16 +347,12 @@ def run():
         first_nonzero[2] = i-1
         last_zero[2] = -1       
     
-    
+
+    # Compute tip position from IMU position
     tipx = np.append(tipx, x[cur_idx:]*scale_factor[0] - len_pen*sey)
     tipy = np.append(tipy, y[cur_idx:]*scale_factor[1] - len_pen*sex)
 
-    #m = 10000
-    #figA.set_xlim([-m, m])
-    #figA.set_ylim([-m, m])
-
-    
- 
+    # Plot if we go from force sensor on to off 
     if (last_forceOn != -1):
       first_zero_f = None
       for idx in range(cur_idx, cur_idx+CHUNKS):
@@ -359,8 +364,6 @@ def run():
         plt.axis('equal')
         last_forceOn = -1
         fig.canvas.draw()
-
-
     if (last_forceOn == -1):
       first_zero_f = None
       for idx in range(cur_idx, cur_idx+CHUNKS):
@@ -370,90 +373,13 @@ def run():
       if(first_zero_f):
         last_forceOn = first_zero_f
 
-
     cur_idx = cur_idx + CHUNKS 
 
+    # Time limit of 10000 samples
     if (cur_idx >= 10000):
       break
 
+  # Keep plot on
   plt.show()
-      
 
 run()
-
-"""
-fig = plt.figure()
-#figA = fig.add_subplot(111, projection = "3d")
-figA = fig.add_subplot(111)
-figA.set_xlabel('x')
-figA.set_ylabel('y') 
-print(x)
-print(y)
-figA.plot(x,y)
-plt.axis('equal')
-plt.show()
-
-
-time = t*15/1000
-
-fig = plt.figure()
-#plt.plot(x)
-#plt.plot(y)
-#plt.plot(z)
-#plt.plot(vx)
-#plt.plot(vy)
-#plt.plot(vz)
-#figA = fig.add_subplot(321)
-#figA.plot(time, ori_ax)
-#figA.plot(time, ori_ay)
-#figA.plot(time, ori_az)
-#plt.xlim([0,100])
-#figA.axis('tight')
-#plt.title('raw accel')
-#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-figB = fig.add_subplot(311)
-figB.plot(time, ax)
-figB.plot(time, ay)
-figB.plot(time, az)
-plt.xlim([0,100])
-figB.axis('tight')
-plt.title('absolute accel')
-plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-#figC = fig.add_subplot(323)
-#figC.plot(time, ori_vx)
-#figC.plot(time, ori_vy)
-#figC.plot(time, ori_vz)
-#plt.title('unadjusted vel')
-#figC.axis('tight')
-#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-figC = fig.add_subplot(312)
-figC.plot(time, vx)
-figC.plot(time, vy)
-figC.plot(time, vz)
-plt.title('adjusted vel')
-figC.axis('tight')
-plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-#figD = fig.add_subplot(325)
-#figD.plot(time, ori_x)
-#figD.plot(time, ori_y)
-#figD.plot(time, ori_z)
-#figD.axis('tight')
-#plt.title('unadjusted position')
-#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-
-figD = fig.add_subplot(313)
-figD.plot(time, x)
-figD.plot(time, y)
-figD.plot(time, z)
-figD.axis('tight')
-plt.title('adjusted position')
-plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-plt.tight_layout()
-plt.show()
-"""

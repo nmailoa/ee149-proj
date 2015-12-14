@@ -3,43 +3,11 @@
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 
-/* This driver reads raw data from the BNO055
-
-   Connections
-   ===========
-   Connect SCL to analog 5
-   Connect SDA to analog 4
-   Connect VDD to 3.3V DC
-   Connect GROUND to common ground
-
-   History
-   =======
-   2015/MAR/03  - First release (KTOWN)
-*/
-
-/* Set the delay between fresh samples */
-#define BNO055_SAMPLERATE_DELAY_MS (10)
-
 #define LED (0)
 #define FORCE_SENSOR (1)
 #define BUTTON (3)
 
-int calibrated = 0;
-
-unsigned int accel_offset_x = 65516;
-unsigned int accel_offset_y = 65509;
-unsigned int accel_offset_z = 2;
-unsigned int mag_offset_x = 65529;
-unsigned int mag_offset_y = 0;
-unsigned int mag_offset_z = 0;
-unsigned int gyro_offset_x = 65258;
-unsigned int gyro_offset_y = 116;
-unsigned int gyro_offset_z = 65087;
-unsigned int accel_radius = 1000;
-unsigned int mag_radius = 570;
-
 Adafruit_BNO055 bno = Adafruit_BNO055();
-
 
 uint8_t sys, gyroCal, accelCal, magCal = 0;
 long time = 0;
@@ -49,8 +17,7 @@ int do_loop = 0;
 boolean debug = 0;
 byte count = 0;
 byte cur_count = 0;
-
-char buff[60] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+char buff[60] = {0};
 int reading_no = 0;
 int ax = 0;
 int ay = 0;
@@ -63,24 +30,17 @@ boolean force = 0;
 imu::Vector<3> accel;
 imu::Vector<3> euler;
 
-ISR(TIMER1_COMPA_vect)
-{
-//digitalWrite(5, debug);
-do_loop = 1;
-count++;
-//if (debug) debug = 0;
-//else debug = 1;
+
+// Timer ISR to trigger reading
+ISR(TIMER1_COMPA_vect){
+  do_loop = 1;
+  count++;
 }
 
-/**************************************************************************/
-/*
-    Arduino setup function (automatically called at startup)
-*/
-/**************************************************************************/
-void setup(void)
-{
-  Bean.setLed(255,0,0);
 
+void setup(void){
+  // Set to red for calibration
+  Bean.setLed(255,0,0);
   
   sync = 0;
   do_loop = 0;
@@ -91,13 +51,12 @@ void setup(void)
   pinMode(BUTTON, INPUT);
   pinMode(FORCE_SENSOR, INPUT);
 
-  //pinMode(12, OUTPUT);
   cli();          // disable global interrupts
   TCCR1A = 0;     // set entire TCCR1A register to 0
   TCCR1B = 0;     // same for TCCR1B
 
   // set compare match register to desired timer count:
-  OCR1A = 117;   // 15ms period
+  OCR1A = 117;    // 15ms period
 
   // turn on CTC mode:
   TCCR1B |= (1 << WGM12);
@@ -110,10 +69,9 @@ void setup(void)
   TIMSK1 |= (1 << OCIE1A);
   sei();          // enable global interrupts
   
-  
+  // Start serial communication
   Serial.begin(57600);
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
-  Serial.println(do_loop);
 
   /* Initialise the sensor */
   if(!bno.begin())
@@ -126,34 +84,13 @@ void setup(void)
   delay(1000);
 
   bno.setExtCrystalUse(true);
-
-  //Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
-  //sendCalibration();
   
 }
 
 
-
-
-/**************************************************************************/
-/*
-    Arduino loop function, called once 'setup' is complete (your own code
-    should go here)
-*/
-/**************************************************************************/
-void loop(void)
-{
-  // Possible vector values can be:
-  // - VECTOR_ACCELEROMETER - m/s^2
-  // - VECTOR_MAGNETOMETER  - uT
-  // - VECTOR_GYROSCOPE     - rad/s
-  // - VECTOR_EULER         - degrees
-  // - VECTOR_LINEARACCEL   - m/s^2
-  // - VECTOR_GRAVITY       - m/s^2
-  
-  /* Display calibration status for each sensor. */
-  
+void loop(void){
   if (do_loop){
+    // Get data from IMU, force sensor and button
     cur_count = count;
     bno.getCalibration(&sys, &gyroCal, &accelCal, &magCal);
     accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
@@ -161,6 +98,7 @@ void loop(void)
     force = digitalRead(FORCE_SENSOR);
     button = digitalRead(BUTTON) | (force << 1);
 
+    // If just got synced
     if (sync == 0 && gyroCal == 3 && accelCal == 3 && magCal == 3){
       buff[0] = char(1 << 7);
       buff[1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
@@ -171,8 +109,10 @@ void loop(void)
       Bean.setLed(246, 255, 0);
       reading_no = 0;
       
+      // Wait for confirmation from PC
       while (Serial.read() != '1');
 
+      // Wait for button press
       Bean.setLed(0,0,255);
       while (digitalRead(BUTTON) != 1);
       while (digitalRead(BUTTON) != 0);
@@ -181,10 +121,14 @@ void loop(void)
       sync = 1;
     }
     else {
+      // If not synced yet
       if (sync == 0){
+        // Set calibration packet in buffer
         buff[12*reading_no] = char(1 << 7);
         buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
         buff[12*reading_no+11] = char(cur_count);
+
+        // Turn on LED based on calibration state
         if (gyroCal == 3 && magCal == 3){
           if (accelCal == 0) Bean.setLed(0,0,0);
           if (accelCal == 1) Bean.setLed(73,243,243);
@@ -193,7 +137,7 @@ void loop(void)
           
       }
       else {
-        
+        // Format data for packeting
         ax = int(accel.x()*100) & 0xfff;
         ay = int(accel.y()*100) & 0xfff;
         az = int(accel.z()*100) & 0xfff;
@@ -202,6 +146,7 @@ void loop(void)
         ey = int(euler.y()*100);
         ez = int(euler.z()*100);
         
+        // Set data packet in buffer
         buff[12*reading_no] = char(1 << 7 | button << 4 | ax >> 8);
         buff[12*reading_no+1] = char(ax & 0xff);
         buff[12*reading_no+2] = char(ay >> 4);
@@ -215,84 +160,19 @@ void loop(void)
         buff[12*reading_no+10] = char(ez & 0xff);
         buff[12*reading_no+11] = char(cur_count);
         
+        // User feedback for force sensor on LED Sequin
         if(force) digitalWrite(LED, HIGH);
         else digitalWrite(LED, LOW);
-
-        //digitalWrite(4, LOW);
       }
+
       reading_no++;
+      // If buffer filled with 5 readings, send to PC
       if (reading_no > 4) {
         Serial.write((const unsigned char*)buff, 60);
         reading_no = 0;
       }
-      
     }
-    
+    // Reset ISR signal
     do_loop = 0;
   }
-}
-
-void saveCalibration(){
-  bno.setMode(Adafruit_BNO055::OPERATION_MODE_CONFIG);
-  
-  accel_offset_x = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_X_LSB_ADDR);
-  accel_offset_x |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_X_MSB_ADDR) << 8);
-  accel_offset_y = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_LSB_ADDR);
-  accel_offset_y |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Y_MSB_ADDR) << 8);
-  accel_offset_z = bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Z_LSB_ADDR);
-  accel_offset_z |= (bno.read8(Adafruit_BNO055::ACCEL_OFFSET_Z_MSB_ADDR) << 8);
-  
-  mag_offset_x = bno.read8(Adafruit_BNO055::MAG_OFFSET_X_LSB_ADDR);
-  mag_offset_x |= (bno.read8(Adafruit_BNO055::MAG_OFFSET_X_MSB_ADDR) << 8);
-  mag_offset_y = bno.read8(Adafruit_BNO055::MAG_OFFSET_Y_LSB_ADDR);
-  mag_offset_y |= (bno.read8(Adafruit_BNO055::MAG_OFFSET_Y_MSB_ADDR) << 8);
-  mag_offset_z = bno.read8(Adafruit_BNO055::MAG_OFFSET_Z_LSB_ADDR);
-  mag_offset_z |= (bno.read8(Adafruit_BNO055::MAG_OFFSET_Z_MSB_ADDR) << 8);
-  
-  gyro_offset_x = bno.read8(Adafruit_BNO055::GYRO_OFFSET_X_LSB_ADDR);
-  gyro_offset_x |= (bno.read8(Adafruit_BNO055::GYRO_OFFSET_X_MSB_ADDR) << 8);
-  gyro_offset_y = bno.read8(Adafruit_BNO055::GYRO_OFFSET_Y_LSB_ADDR);
-  gyro_offset_y |= (bno.read8(Adafruit_BNO055::GYRO_OFFSET_Y_MSB_ADDR) << 8);
-  gyro_offset_z = bno.read8(Adafruit_BNO055::GYRO_OFFSET_Z_LSB_ADDR);
-  gyro_offset_z |= (bno.read8(Adafruit_BNO055::GYRO_OFFSET_Z_MSB_ADDR) << 8);
-  
-  accel_radius = bno.read8(Adafruit_BNO055::ACCEL_RADIUS_LSB_ADDR);
-  accel_radius |= (bno.read8(Adafruit_BNO055::ACCEL_RADIUS_MSB_ADDR) << 8);
-  mag_radius = bno.read8(Adafruit_BNO055::MAG_RADIUS_LSB_ADDR);
-  mag_radius |= (bno.read8(Adafruit_BNO055::MAG_RADIUS_MSB_ADDR) << 8);
-  
-  bno.setMode(Adafruit_BNO055::OPERATION_MODE_NDOF);
-}
-
-void sendCalibration(){
-  Serial.println("Sending calibration");
-  bno.setMode(Adafruit_BNO055::OPERATION_MODE_CONFIG);
-  
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_X_LSB_ADDR, accel_offset_x & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_X_MSB_ADDR, (accel_offset_x >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Y_LSB_ADDR, accel_offset_y & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Y_MSB_ADDR, (accel_offset_y >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Z_LSB_ADDR, accel_offset_z & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_OFFSET_Z_MSB_ADDR, (accel_offset_z >> 8) & 0xFF);
-
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_X_LSB_ADDR, mag_offset_x & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_X_MSB_ADDR, (mag_offset_x >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_Y_LSB_ADDR, mag_offset_y & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_Y_MSB_ADDR, (mag_offset_y >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_Z_LSB_ADDR, mag_offset_z & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_OFFSET_Z_MSB_ADDR, (mag_offset_z >> 8) & 0xFF);
-
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_X_LSB_ADDR, gyro_offset_x & 0xFF);
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_X_MSB_ADDR, (gyro_offset_x >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Y_LSB_ADDR, gyro_offset_y & 0xFF);
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Y_MSB_ADDR, (gyro_offset_y >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Z_LSB_ADDR, gyro_offset_z & 0xFF);
-  bno.write8(Adafruit_BNO055::GYRO_OFFSET_Z_MSB_ADDR, (gyro_offset_z >> 8) & 0xFF);  
-
-  bno.write8(Adafruit_BNO055::ACCEL_RADIUS_LSB_ADDR, accel_radius & 0xFF);
-  bno.write8(Adafruit_BNO055::ACCEL_RADIUS_MSB_ADDR, (accel_radius >> 8) & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_RADIUS_LSB_ADDR, mag_radius & 0xFF);
-  bno.write8(Adafruit_BNO055::MAG_RADIUS_MSB_ADDR, (mag_radius >> 8) & 0xFF);
-  
-  bno.setMode(Adafruit_BNO055::OPERATION_MODE_NDOF);
 }
