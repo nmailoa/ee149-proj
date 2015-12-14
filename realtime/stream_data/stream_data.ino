@@ -22,6 +22,7 @@
 
 #define LED (13)
 #define FORCE_SENSOR (1)
+#define BUTTON (3)
 
 int calibrated = 0;
 
@@ -88,7 +89,7 @@ void setup(void)
   
   pinMode(0, INPUT);
   pinMode(LED, OUTPUT);
-  pinMode(3, INPUT);
+  pinMode(BUTTON, INPUT);
   pinMode(FORCE_SENSOR, INPUT);
   pinMode(4, OUTPUT);
 
@@ -161,7 +162,7 @@ void loop(void)
     accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
     euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     force = digitalRead(FORCE_SENSOR);
-    button = digitalRead(0) | (force << 1);
+    button = digitalRead(BUTTON) | (force << 1);
 
     //gyroCal = 3; // DEBUG
 
@@ -178,8 +179,8 @@ void loop(void)
       while (Serial.read() != '1');
 
       Bean.setLed(0,0,255);
-      while (digitalRead(3) != 1);
-      while (digitalRead(3) != 0);
+      while (digitalRead(BUTTON) != 1);
+      while (digitalRead(BUTTON) != 0);
       Bean.setLed(0,255,0);
       
       sync = 1;
@@ -190,7 +191,7 @@ void loop(void)
         buff[12*reading_no+1] = char(sys << 6 | accelCal << 4 | gyroCal << 2 | magCal);
         buff[12*reading_no+11] = char(cur_count);
         if (gyroCal == 3 && magCal == 3){
-          if (accelCal == 0) 
+          if (accelCal == 0) Bean.setLed(0,0,0);
           if (accelCal == 1) Bean.setLed(73,243,243);
           if (accelCal == 2) Bean.setLed(242,189,73);
         }
@@ -198,15 +199,15 @@ void loop(void)
       }
       else {
 
-        digitalWrite(4, HIGH);
+        //digitalWrite(4, HIGH);
         
-        ax = int(accel.x()*100);
+        ax = int(accel.x()*100) & 0xfff;
         //if (ax < 0) ax = abs(ax) | 0x800;
         //ax = ax & 0xfff;
-        ay = int(accel.y()*100);
+        ay = int(accel.y()*100) & 0xfff;
         //if (ay < 0) ax = abs(ay) | 0x800;
         //ay = ay & 0xfff;
-        az = int(accel.z()*100);
+        az = int(accel.z()*100) & 0xfff;
         //if (az < 0) az = abs(az) | 0x800;
         //az = az & 0xfff;
 
@@ -231,7 +232,7 @@ void loop(void)
         //if(force) Bean.setLed(255, 255, 0);
         //else Bean.setLed(0,255, 0);
 
-        digitalWrite(4, LOW);
+        //digitalWrite(4, LOW);
       }
       reading_no++;
       if (reading_no > 4) {

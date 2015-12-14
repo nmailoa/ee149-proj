@@ -21,14 +21,16 @@ x = np.array([])
 y = np.array([])
 z = np.array([])
 t = np.array([])
-v_anchor = np.array([])
 tipx = np.array([])
 tipy = np.array([])
 forceSensor = np.array([])
 len_pen = 0.1
+accel_thres = 0.15
+accel_time_lim = 0.1
 
 CHUNKS = 20
 
+scale_factor = [10/9.5, 10/7.5]
 
 def serial_ports():
   """Lists serial ports
@@ -82,26 +84,25 @@ def run():
   mean_x = 0
   mean_y = 0
   mean_z = 0
-  alpha = 0.9
+  lpf_alpha = 0.9
+  hpf_alpha = 0.99
+  cal_pow = 2
   last_ax = 0
   last_ay = 0
   last_az = 0
-  last_zero = 0
+  last_zero = [1,1,1]
+  first_nonzero = [0,0,0]
+  last_forceOn = -1
   base_ex = 0
   base_ey = 0
   base_ez = 0
-
-  ser.flush()
   failcount = 0
 
-  calibrated = 1 #0
+  ser.flush()
+
+  calibrated = 0#1 #0
   while(calibrated != 1):
     try:
-      """
-      line = ser.readline().decode().rstrip('\n')
-      data = re.split(",", line)
-      """
-
       line = (ser.read(12))
       c = line[1]
       print(str((c & 0xc0) >> 6) + str((c & 0x30) >> 4) + str((c & 0x0c) >> 2) + str(c & 0x03))
@@ -119,8 +120,8 @@ def run():
   ser.write('1'.encode())
   ser.flushInput()
   print(ser.inWaiting())
-  t0 = time.time()
 
+  #Throw away first 20
 
   data_file = open('data', 'w')
   plt.ion()
@@ -129,10 +130,11 @@ def run():
   figA = fig.add_subplot(111)
   figA.set_xlabel('x')
   figA.set_ylabel('y')  
-  
+
   #Throw away first 20
   for i in range(20):
     line = ser.read(12)
+
 
   base_time = 0
   while(True):
@@ -149,14 +151,7 @@ def run():
         print("Failed more than 20 times")
         exit()
       try:
-        """
-        line = ser.readline().decode().rstrip('\n')
-        data_file.write(line)
-        data_file.write('\n')
-        data = re.split(",", line)
-        """
-
-        line = (ser.read(12))
+        line = ser.read(12) 
 
         force = (line[0] >> 5) & 0x1;
 
@@ -184,31 +179,36 @@ def run():
         ext = int(ext)/100
 
         timetemp = int(line[11])
-        #if (t.size != 0 and timetemp < t[-1]): timetemp = t[-1] + timetemp
-        #if timetemp - t[-1] < 0:
-        #  base_time = base_time + 255
-        #timetemp = timetemp + base_time
+        if t != [] and timetemp+base_time - t[-1] < 0:
+          base_time = base_time + 256
+        timetemp = timetemp + base_time
         # Get rid of mean and threshold
 
         temp = float(axt)
-        mean_x = mean_x * 0.999 + temp * 0.001
-        temp = temp - mean_x if abs(temp-mean_x) > 0.15 else 0
-        last_ax = last_ax*alpha + temp*(1-alpha)
-        tax[count] = last_ax
+        if (cur_idx == 0 and count == 0):
+          mean_x = temp
+        mean_x = mean_x * hpf_alpha + temp * (1-hpf_alpha)
+        temp = temp - mean_x 
+        last_ax = last_ax*lpf_alpha + temp*(1-lpf_alpha)
+        tax[count] = last_ax if abs(last_ax) > accel_thres/3 else 0
 
         temp = float(ayt)
-        mean_y = mean_y * 0.999 + temp * 0.001
-        temp = temp - mean_y if abs(temp-mean_y) > 0.15 else 0
-        last_ay = last_ay*alpha + temp*(1-alpha)
-        tay[count] = last_ay
+        if (cur_idx == 0 and count == 0):
+          mean_y = temp
+        mean_y = mean_y * hpf_alpha + temp * (1-hpf_alpha)
+        temp = temp - mean_y
+        last_ay = last_ay*lpf_alpha + temp*(1-lpf_alpha)
+        tay[count] = last_ay if abs(last_ay) > accel_thres/3 else 0
 
         temp = float(azt)
-        mean_z = mean_z * 0.999 + temp * 0.001
-        temp = temp - mean_z if abs(temp-mean_z) > 0.15 else 0
-        last_az = last_az*alpha + temp*(1-alpha)
-        taz[count] = last_az
+        if (cur_idx == 0 and count == 0):
+          mean_z = temp
+        mean_z = mean_z * hpf_alpha + temp * (1-hpf_alpha)
+        temp = temp - mean_z
+        last_az = last_az*lpf_alpha + temp*(1-lpf_alpha)
+        taz[count] = last_az if abs(last_az) > accel_thres/3 else 0
 
-        print(str(last_ax) + '\t' + str(last_ay) + '\t' + str(last_az) + '\t' + str(timetemp) + '\t' + str(force))
+        print('\t' + str(timetemp) + '\t' + str(force))
 
         if (cur_idx == 0 and count == 0):
           ex[count] = 0
@@ -259,176 +259,199 @@ def run():
       timestep = (t[i] - t[i-1])*15/1000
 
       # update velocity
-      #vx[i+1] = vx[i] + ax[i]*timestep
-      #vy[i+1] = vy[i] + ay[i]*timestep
-      #vz[i+1] = vz[i] + az[i]*timestep
       vx = np.append(vx, vx[i-1]+ax[i-1]*timestep)
       vy = np.append(vy, vy[i-1]+ay[i-1]*timestep)
       vz = np.append(vz, vz[i-1]+az[i-1]*timestep)
 
       # update position
-      #x[i+1] = x[i] + vx[i]*timestep
-      #y[i+1] = y[i] + vy[i]*timestep
-      #z[i+1] = z[i] + vz[i]*timestep
       x = np.append(x, x[i-1]+vx[i-1]*timestep)
       y = np.append(y, y[i-1]+vy[i-1]*timestep)
       z = np.append(z, z[i-1]+vz[i-1]*timestep)
 
-      if (abs(ax[i]) <= 0.2 and abs(ay[i]) <= 0.2 and abs(az[i]) <= 0.2):
-        if last_zero == 0:
-          last_zero = t[i]
+      if (abs(ax[i]) <= accel_thres):
+        if first_nonzero[0] != -1 and last_zero[0] == -1:
+          last_zero[0] = i   
       else:
-        last_zero = 0    
+        last_zero[0] = -1    
+        if first_nonzero[0] == -1:
+          first_nonzero[0] = i   
 
       # calibrate vel if more than half a second w no accel
-      v_anchor = np.append(v_anchor, [0])
-      if (last_zero != 0 and (t[i] - last_zero) > 0.3):
-
-        last_v_anchor = [j for j, e in enumerate(v_anchor) if e != 0]
-        last_v_anchor = last_v_anchor[-1]
-        if (i != last_v_anchor):
-          """
-          posx = sum([x for x in ax[last_v_anchor:i] if x > 0])
-          negx = sum([x for x in ax[last_v_anchor:i] if x < 0])
-          if(posx>0 and negx>0):
-            ax[last_v_anchor:i] = [x*(posx+negx)/2/posx if x > 0 else x*(posx+negx)/2/negx for x in ax[last_v_anchor:i]]
-          posy = sum([x for x in ay[last_v_anchor:i] if x > 0])
-          negy = sum([x for x in ay[last_v_anchor:i] if x < 0])
-          if(posy>0 and negy>0):
-            ay[last_v_anchor:i] = [x*(posy+negy)/2/posy if x > 0 else x*(posy+negy)/2/posy for x in ay[last_v_anchor:i]]
-          posz = sum([x for x in az[last_v_anchor:i] if x > 0])
-          negz = sum([x for x in az[last_v_anchor:i] if x < 0])
-          if(posz>0 and negz>0):
-            az[last_v_anchor:i] = [x*(posz+negz)/2/posz if x > 0 else x*(posz+negz)/2/posz for x in az[last_v_anchor:i]]
-
-          for j in range(i - last_v_anchor+1):
-            timestep = (t[j+last_v_anchor-1] - t[j+last_v_anchor])
-            vx[j+last_v_anchor] = vx[j+last_v_anchor-1]+ax[j+last_v_anchor-1]*timestep
-            vy[j+last_v_anchor] = vy[j+last_v_anchor-1]+ay[j+last_v_anchor-1]*timestep
-            vz[j+last_v_anchor] = vz[j+last_v_anchor-1]+az[j+last_v_anchor-1]*timestep
-          """
+      if (last_zero[0] != -1 and (t[i] - t[last_zero[0]]) > accel_time_lim*1000/15):
+        for j in range(first_nonzero[0], last_zero[0]+1):
+          timestep = (t[j] - t[j-1])*15/1000
+          vx[j] = vx[j] - ((j-first_nonzero[0])/(last_zero[0]-first_nonzero[0]))**cal_pow*vx[last_zero[0]]
+          x[j] = x[j-1] + vx[j-1]*timestep
+        for j in range(last_zero[0], i+1):
+          vx[j] = 0
+          x[j] = x[j-1]
+        first_nonzero[0] = i-1
+        last_zero[0] = -1
 
 
-          for j in range(i - last_v_anchor+2):
-            timestep = (t[j+last_v_anchor] - t[j+last_v_anchor-1])*15/1000
-            vx[j+last_v_anchor-1] = vx[j+last_v_anchor-1] - j/(i-last_v_anchor)*vx[i]
-            vy[j+last_v_anchor-1] = vy[j+last_v_anchor-1] - j/(i-last_v_anchor)*vy[i]
-            vz[j+last_v_anchor-1] = vz[j+last_v_anchor-1] - j/(i-last_v_anchor)*vz[i]
-            if (j+last_v_anchor < len(x)):
-              x[j+last_v_anchor] = x[j+last_v_anchor-1] + vx[j+last_v_anchor-1]*timestep
-              y[j+last_v_anchor] = y[j+last_v_anchor-1] + vy[j+last_v_anchor-1]*timestep
-              z[j+last_v_anchor] = z[j+last_v_anchor-1] + vz[j+last_v_anchor-1]*timestep
-          #x[i] = x[i-1] + vx[i]*timestep
-          #y[i] = y[i-1] + vy[i]*timestep
-          #z[i] = z[i-1] + vz[i]*timestep
-        last_zero = t[i]
-        v_anchor[i-1] = 1
 
-    
-    if (cur_idx >= 10000):
-      print(time.time() - t0)
-      break
-    
-    tipx = np.append(tipx, x[cur_idx:] - len_pen*sey)
-    tipy = np.append(tipy, y[cur_idx:] - len_pen*sex)
 
-    #m = max(max(abs(tipx)), max(abs(tipy)))
-    m = 10000
-    figA.set_xlim([-m, m])
-    figA.set_ylim([-m, m])
-    figA.cla()
-    starts = np.where(forceSensor[1:] - forceSensor[:-1] == 1)[0]
-    ends = np.where(forceSensor[1:] - forceSensor[:-1] == -1)[0]
-    print(starts)
-    for a,j in enumerate(starts):
-      if (a != len(starts) - 1 and j - ends[a] < 10):
-        pass
-      if a == len(starts) - 1:
-        figA.plot(tipx[j:],tipy[j:])
+      if (abs(ay[i]) <= accel_thres):
+        if first_nonzero[1] != -1 and last_zero[1] == -1:
+          last_zero[1] = i   
       else:
-        figA.plot(tipx[j:ends[a]],tipy[j:ends[a]])
-    fig.canvas.draw()
+        last_zero[1] = -1    
+        if first_nonzero[1] == -1:
+          first_nonzero[1] = i   
+
+      # calibrate vel if more than half a second w no accel
+      if (last_zero[1] != -1 and (t[i] - t[last_zero[1]]) > accel_time_lim*1000/15):
+        for j in range(first_nonzero[1], last_zero[1]+1):
+          timestep = (t[j] - t[j-1])*15/1000
+          vy[j] = vy[j] - ((j-first_nonzero[1])/(last_zero[1]-first_nonzero[1]))**cal_pow*vy[last_zero[1]]
+          y[j] = y[j-1] + vy[j-1]*timestep
+        for j in range(last_zero[1], i+1):
+          vy[j] = 0
+          y[j] = y[j-1]
+        first_nonzero[1] = i-1
+        last_zero[1] = -1
+
+
+
+
+      if (abs(az[i]) <= accel_thres):
+        if first_nonzero[2] != -1 and last_zero[2] == -1:
+          last_zero[2] = i   
+      else:
+        last_zero[2] = -1    
+        if first_nonzero[2] == -1:
+          first_nonzero[2] = i   
+
+      # calibrate vel if more than half a second w no accel
+      if (last_zero[2] != -1 and (t[i] - t[last_zero[2]]) > accel_time_lim*1000/15):
+        for j in range(first_nonzero[2], last_zero[2]+1):
+          timestep = (t[j] - t[j-1])*15/1000
+          vz[j] = vz[j] - ((j-first_nonzero[2])/(last_zero[2]-first_nonzero[2]))**cal_pow*vz[last_zero[2]]
+          z[j] = z[j-1] + vz[j-1]*timestep
+        for j in range(last_zero[2], i+1):
+          vz[j] = 0
+          z[j] = z[j-1]
+        first_nonzero[2] = i-1
+        last_zero[2] = -1       
+    
+    
+    tipx = np.append(tipx, x[cur_idx:]*scale_factor[0] - len_pen*sey)
+    tipy = np.append(tipy, y[cur_idx:]*scale_factor[1] - len_pen*sex)
+
+    #m = 10000
+    #figA.set_xlim([-m, m])
+    #figA.set_ylim([-m, m])
+
+    
+ 
+    if (last_forceOn != -1):
+      first_zero_f = None
+      for idx in range(cur_idx, cur_idx+CHUNKS):
+        if forceSensor[idx] == 0:
+          first_zero_f = idx
+          break   
+      if (first_zero_f):
+        figA.plot(tipx[last_forceOn:first_zero_f], tipy[last_forceOn:first_zero_f], 'blue')
+        last_forceOn = -1
+        fig.canvas.draw()
+        print("I was supposed to draw something!")
+        print(tipx[last_forceOn:first_zero_f])
+        print(tipy[last_forceOn:first_zero_f])
+
+
+    if (last_forceOn == -1):
+      first_zero_f = None
+      for idx in range(cur_idx, cur_idx+CHUNKS):
+        if forceSensor[idx] == 1:
+          first_zero_f = idx
+          break  
+      if(first_zero_f):
+        last_forceOn = first_zero_f
+
 
     cur_idx = cur_idx + CHUNKS 
-        
+
+    if (cur_idx >= 10000):
+      break
+
   plt.show()
-
-"""
-
-    m = max(max(max(abs(x)), max(abs(y))), max(abs(z)))
-    figA.set_xlim([-m, m])
-    figA.set_ylim([-m, m])
-    figA.set_zlim([-m, m])
-    figA.plot(x[cur_idx:cur_idx+CHUNKS],y[cur_idx:cur_idx+CHUNKS],z[cur_idx:cur_idx+CHUNKS])
-    #plt.show()
-    fig.canvas.draw()
-"""
-
-
-
-"""
-  fig = plt.figure()
-  figA = fig.add_subplot(111, projection = "3d")
-  figA.set_xlim([-m, m])
-  figA.set_ylim([-m, m])
-  figA.set_zlim([-m, m])
-  figA.scatter(x[0],y[0],z[0])
-  figA.plot(x,y,z)
-  figA.set_xlabel('x')
-  figA.set_ylabel('y')
-  figA.set_zlabel('z')
-  plt.show()
-
-  fig = plt.figure()
-  figB = fig.add_subplot(311)
-  figB.plot(t, ax)
-  figB.plot(t, ay)
-  figB.plot(t, az)
-  figB.axis('tight')
-  plt.title('filtered accel')
-  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-  figC = fig.add_subplot(312)
-  figC.plot(t, vx)
-  figC.plot(t, vy)
-  figC.plot(t, vz)
-  plt.title('adjusted vel')
-  figC.axis('tight')
-  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-  figD = fig.add_subplot(313)
-  figD.plot(t, x)
-  figD.plot(t, y)
-  figD.plot(t, z)
-  figD.axis('tight')
-  plt.title('position')
-  plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
-
-  plt.tight_layout()
-  plt.show()
-
-  text_file = open('log', 'w')
-  text_file.write(', '.join([str(x) for x in ax]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in ay]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in az]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in vx]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in vy]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in vz]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in x]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in y]))
-  text_file.write('\n')
-  text_file.write(', '.join([str(x) for x in t]))
-  text_file.write('\n')
-  text_file.close()
-  data_file.close()
-"""
+      
 
 run()
 
+"""
+fig = plt.figure()
+#figA = fig.add_subplot(111, projection = "3d")
+figA = fig.add_subplot(111)
+figA.set_xlabel('x')
+figA.set_ylabel('y') 
+print(x)
+print(y)
+figA.plot(x,y)
+plt.axis('equal')
+plt.show()
+
+
+time = t*15/1000
+
+fig = plt.figure()
+#plt.plot(x)
+#plt.plot(y)
+#plt.plot(z)
+#plt.plot(vx)
+#plt.plot(vy)
+#plt.plot(vz)
+#figA = fig.add_subplot(321)
+#figA.plot(time, ori_ax)
+#figA.plot(time, ori_ay)
+#figA.plot(time, ori_az)
+#plt.xlim([0,100])
+#figA.axis('tight')
+#plt.title('raw accel')
+#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+figB = fig.add_subplot(311)
+figB.plot(time, ax)
+figB.plot(time, ay)
+figB.plot(time, az)
+plt.xlim([0,100])
+figB.axis('tight')
+plt.title('absolute accel')
+plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+#figC = fig.add_subplot(323)
+#figC.plot(time, ori_vx)
+#figC.plot(time, ori_vy)
+#figC.plot(time, ori_vz)
+#plt.title('unadjusted vel')
+#figC.axis('tight')
+#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+figC = fig.add_subplot(312)
+figC.plot(time, vx)
+figC.plot(time, vy)
+figC.plot(time, vz)
+plt.title('adjusted vel')
+figC.axis('tight')
+plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+#figD = fig.add_subplot(325)
+#figD.plot(time, ori_x)
+#figD.plot(time, ori_y)
+#figD.plot(time, ori_z)
+#figD.axis('tight')
+#plt.title('unadjusted position')
+#plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+
+figD = fig.add_subplot(313)
+figD.plot(time, x)
+figD.plot(time, y)
+figD.plot(time, z)
+figD.axis('tight')
+plt.title('adjusted position')
+plt.legend(['x', 'y', 'z'],loc='center left', bbox_to_anchor=(1, 0.5))
+
+plt.tight_layout()
+plt.show()
+"""
