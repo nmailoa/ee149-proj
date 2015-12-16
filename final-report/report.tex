@@ -1,5 +1,6 @@
 \documentclass[12pt,journal]{IEEEtran}
 \usepackage[letterpaper, margin=0.8in]{geometry}
+\usepackage{framed, listings}
 
 \begin{document}
 
@@ -8,6 +9,7 @@
 \author{EE149/249A Project Report, Fall 2015
 
 Reia Cho, Christian (CJ) Geering, Nathaniel Mailoa, Rachel Zhang}
+
 
 
 % make the title area
@@ -50,9 +52,18 @@ We would like to acknowledge the following individuals for their support and con
 \item Casey Rogers, \textit{UC Berkeley 3D Modeling Club}
 \end{itemize}
 
+\newpage
+\onecolumn
+
 \section{Appendix 1: LightBlue Bean code}
+\small{
+\lstinputlisting[language=C,frame=single,breaklines=true]{stream_data.ino}
+}
 
 \section{Appendix 2: Python code}
+\small{
+\lstinputlisting[language=Python,frame=single,breaklines=true]{draw.py}
+}
 
 \end{document}
 
