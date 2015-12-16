@@ -1,0 +1,57 @@
+\documentclass[12pt,journal]{IEEEtran}
+\usepackage[letterpaper, margin=0.8in]{geometry}
+
+\begin{document}
+
+\title{reWRITE}
+
+\author{EE149/249A Project Report, Fall 2015
+
+Reia Cho, Christian (CJ) Geering, Nathaniel Mailoa, Rachel Zhang}
+
+
+% make the title area
+\maketitle
+
+\section{Project Goal}
+We will create an affordable device that enhances writing utensils such as whiteboard markers by recording and/or broadcasting the writing. This device will be beneficial especially for disabled students who have trouble viewing the whiteboard in a large classroom.
+
+
+\section{Project Approach}
+The device will gather accelerometer and gyroscope data as well as pressure sensor information from the writing utensil and stream the raw data to a laptop through Bluetooth connection. A software in the laptop will then reconstruct the writing on the board and broadcast the writing through a website or smartphone app.
+
+
+\section{Resources}
+We plan to use either a Bosch BNO055 Absolute Orientation IMU (on an Adafruit breakout board) and a round Force-Sensitive Resistor (Interlink 402) as our on-board sensors. We will also have a Nordic nRF51822 Bluetooth LE System on Chip (on a RedBearLab BLE Nano board) that contains an ARM Cortex M0 as a microcontroller to send data from the device to a laptop. We have one or two soft buttons on the device for user input during calibration as well as small LED(s) for user feedback, all connected to the microcontroller. The system will be powered either by a 3V coin cell battery or a small battery pack.
+
+There are three main components of this project that can be done in parallel: (1) building the hardware system and connecting all the components together, (2) prototyping and 3D-printing the physical device, and (3) researching and/or writing the software that translates IMU data into positional data and realizes a finite state machine of the system. Once we have these three components done, we can integrate the system and write the user interface software.
+
+
+\newpage
+
+\section{Schedule}
+\begin{itemize}
+\item October 20: Project charter (this document); Confirm mentor
+\item October 31: Choice of sensors and boards made and ordered after discussion with mentor and GSIs
+\item November 4: Learn how to 3D Print and have at least one prototype of the device; Have sufficient testing to confirm sensors and hardware choices and reorder parts if necessary
+\item November 11: Have working code that gathers data from sensors to a laptop through wired microcontroller and reproduces writing; Have code that transfers arbitrary data from the Nordic M0 core to a laptop through BLE
+\item November 15: Project mini-update videos
+\item November 17-24: Project review with mentor/GSIs
+\item November 24: Project milestone report due
+\item December 10: Full system integration; UI developed; Drift errors computed
+\item December 14: Final presentation and demo
+\item December 16: Project report and video due; Peer evaluation due
+\end{itemize}
+
+
+\section{Risk and Feasibility}
+Our main concern is finding the algorithm that translates IMU data to positional data to recover writing; the sensitivity of the sensors might be an important factor in this issue. Noise might also be an issue, especially since the user might wave around the writing utensil. This might contribute to some drift errors, which leads to a concern on device calibration frequency. 
+
+A lot of the tasks in the project are independent of each other, so each task should be able to progress without waiting for other tasks. We only need to integrate the whole system in the end.
+
+
+% that's all folks
+\end{document}
+
+
+
