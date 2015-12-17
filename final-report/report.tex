@@ -67,8 +67,8 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
   \caption{BNO055 IMU breakout board}
   \label{fig:imu}
 \end{figure}
-The BNO055 is a 9-Degree of Freedom Inertial Measurement Unit (IMU) that provides accelerometer, gyroscope, and magnetometer data. Running onboard the 32-bit M0+ microcontroller is the Bosch Sensortec sensor fusion algorithm that combines sensor data for calibration and filtering. This gives us linear accelerations because the sensor fusion accounts for gravity. The processed data is available at a datarate of 100Hz. We also used this device to send Euler angles, which is calibrated against the magnetometer to provide absolute orientation with respect to North. The IMU communicates to the Bean through I2C in the Bean’s analog pins.
-When the device is initially powered, it must be calibrated. Each sensor is calibrated separately by the onboard microcontroller and a register in the device stores the calibration status for each sensor out of 3. The gyroscope is calibrated by keeping the IMU stationary. The magnetometer is calibrated by drawing a figure eight. The hardest sensor to calibrate is the accelerometer. To do so, the IMU must be stationary for a few seconds in various orientations. Overall, the three sensors take about 30 to 60 seconds to calibrate. To help with calibration, we use the Bean’s RGB LED to signify the calibration status using color-coding. Even after the IMU is fully calibrated, it is still not perfect, which we will discuss in the position reconstruction section.
+  The BNO055 is a 9-Degree of Freedom Inertial Measurement Unit (IMU) that provides accelerometer, gyroscope, and magnetometer data. Running onboard the 32-bit M0+ microcontroller is the Bosch Sensortec sensor fusion algorithm that combines sensor data for calibration and filtering. This gives us linear accelerations because the sensor fusion accounts for gravity. The processed data is available at a datarate of 100Hz. We also used this device to send Euler angles, which is calibrated against the magnetometer to provide absolute orientation with respect to North. The IMU communicates to the Bean through I2C in the Bean’s analog pins.
+  When the device is initially powered, it must be calibrated. Each sensor is calibrated separately by the onboard microcontroller and a register in the device stores the calibration status for each sensor out of 3. The gyroscope is calibrated by keeping the IMU stationary. The magnetometer is calibrated by drawing a figure eight. The hardest sensor to calibrate is the accelerometer. To do so, the IMU must be stationary for a few seconds in various orientations. Overall, the three sensors take about 30 to 60 seconds to calibrate. To help with calibration, we use the Bean’s RGB LED to signify the calibration status using color-coding. Even after the IMU is fully calibrated, it is still not perfect, which we will discuss in the position reconstruction section.
 \subsection{Li-Ion Battery}
 
 \begin{figure}[H]
@@ -77,8 +77,7 @@ When the device is initially powered, it must be calibrated. Each sensor is cali
   \caption{3.7V 150mAh Li-Ion battery}
   \label{fig:battery}
 \end{figure}
-
-	To power all of our devices, we use a 3.7V 150 mAh Li-Ion battery with a breakout board. We chose the relatively small capacity to fit the form factor of the reWRITE. The LightBlue Bean, however, needs a 3.0 to 3.6 V source since it does not have an onboard regulator. Luckily the IMU breakout board has a 5V to 3.3V regulator, so we power the Bean up through the IMU board.
+  To power our devices, we use a 3.7V 150 mAh Li-Ion battery with a breakout board. This battery was chosen because the small size fits the form factor of the reWRITE. The LightBlue Bean is hooked up to the battery through the IMU board because it needs a source between 3.0 to 3.6V and does not have an on-board regulator.
 
 \subsection{Force Sensor}
 
@@ -88,16 +87,15 @@ When the device is initially powered, it must be calibrated. Each sensor is cali
   \caption{Force sensor}
   \label{fig:system}
 \end{figure}
-
-	To detect when someone is writing with the marker, we attached a force sensor to the back of the marker casing such that the marker pushes against it when it is in use. The force sensor is, effectively, a variable resistor -- about 8 KOhms when not pushed and about 2 KOhms when pushed. We used a resistive divider circuit and a digitalRead() function on the LightBlue Bean to determine when the marker was being used. To prevent the marker from constantly pushing the force sensor when the user is not writing, we added a spring between the force sensor and the marker.
+  To detect when someone is writing with the marker, we attached a force sensor to the back of the marker casing such that the marker pushes against it when it is in use. The force sensor is, effectively, a variable resistor -- about 8 K$\Omega$ when not pushed and about 2 K$\Omega$ when pushed. We used a resistive divider circuit and the digitalRead() function on the LightBlue Bean to determine when the marker was being used. A spring between the force sensor and the marker prevents the marker from constantly pushing against the force sensor.
 
 \subsection{Button and LED Sequin}
-	Our last two peripherals were a button and an LED Sequin. The LED Sequin is a tiny module containing a surface-mount LED and resistor and was used for user feedback to show whether or not the force sensor was being pushed. The reWRITE also has a small tactile button used a resistive divider circuit similar to that of the force sensor. This lets the user signify that the marker was ready for position calibration (to establish a point of origin). It was also used to clear the plotting canvas in the reconstruction.
+  Our last two peripherals were a button and an LED Sequin. The LED Sequin is a tiny module containing a surface-mount LED and resistor which shows whether or not the force sensor is being pushed. The reWRITE also has a small tactile button hooked up to a resistive divider circuit. This lets the user signify that the marker was ready for position calibration (to establish a point of origin). It is also used to clear the plotting canvas in the reconstruction.
 
 \section{Casing}
-	For our project, we needed a custom marker casing to attach a force sensor and mount our sensors, peripherals, and microcontroller. Because of cost, ease of use, and endless design possibilities, we chose to 3D print a casing. To make the 3D model, we used Autodesk’s Fusion 360 3D CAD/CAM software and the LulzBot TAZ 5 3D printer. For filament, we initially tried ABS plastic, but we switched to PLA plastic to alleviate warping issues.
-	Our first version was a threaded design with three components: the end cap, the body, and the front cap. To optimize printing time, we printed the body on its side. Each component had support material to retain structure. However, printing threads proved to be difficult to do well. Thus our second version was a snap lock design with the same three main components. This design was more simple but to improve printing quality, we printed the body in two parts and added more support material. 
-With the finished print, we used hot glue to fix the force sensor with the spring on the end cap, and secured the marker in the casing with the front cap. Unfortunately, the design does not allow the marker to be capped while it is in the casing.
+  For our project, we needed a custom marker casing to attach a force sensor and mount our sensors, peripherals, and microcontroller. Because of cost, ease of use, and endless design possibilities, we chose to 3D print a casing. To make the 3D model, we used Autodesk’s Fusion 360 3D CAD/CAM software and the LulzBot TAZ 5 3D printer. For filament, we initially tried ABS plastic, but we switched to PLA plastic to alleviate warping issues. With used a snap lock design with three components: a end cap, a body, and a front cap. The body of this design was printed in two parts with support material in between to retain structure.
+  With the finished print, we used hot glue to fix the force sensor with the spring on the end cap, and secured the marker in the casing with the front cap. Unfortunately, the design does not allow the marker to be capped while it is in the casing.
+
 
 \begin{figure}[h]
   \centering
