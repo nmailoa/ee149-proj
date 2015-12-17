@@ -23,7 +23,7 @@ INSERT TEXT HERE
 \section{System}
 
 \begin{figure}[H]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/system}
   \caption{reWRITE system}
   \label{fig:system}
@@ -34,7 +34,7 @@ INSERT TEXT HERE
 \subsection{LightBlue Bean}
 
 \begin{figure}[H]
-  %\centering
+  \centering
     \includegraphics[width=0.8\linewidth]{figures/bean}
   \caption{LightBlue Bean}
   \label{fig:bean}
@@ -47,7 +47,7 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 \subsection{BNO055 Absolute Orientation Sensor Breakout Board}
 
 \begin{figure}[H]
-  %\centering
+  \centering
     \includegraphics[width=0.6\linewidth]{figures/imu}
   \caption{BNO055 IMU breakout board}
   \label{fig:imu}
@@ -57,7 +57,7 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 \subsection{Li-Ion Battery}
 
 \begin{figure}[H]
-  %\centering
+  \centering
     \includegraphics[width=0.6\linewidth]{figures/battery}
   \caption{3.7V 150mAh Li-Ion battery}
   \label{fig:battery}
@@ -67,7 +67,7 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 \subsection{Force Sensor}
 
 \begin{figure}[H]
-  %\centering
+  \centering
     \includegraphics[width=0.6\linewidth]{figures/force-sensor}
   \caption{Force sensor}
   \label{fig:system}
@@ -83,14 +83,14 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=0.6\linewidth]{figures/3d-model}
   \caption{Casing model}
   \label{fig:3d-model}
 \end{figure}
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=0.6\linewidth]{figures/3d-print}
   \caption{3D printing the casing}
   \label{fig:3d-print}
@@ -103,11 +103,11 @@ To digitize writing with IMU data, position reconstruction is developed using va
 	The Bosch IMU provides accelerometer, gyroscope, and magnetometer data. The on-chip Sensortec sensor fusion subtracts the gravity vector to provide linear acceleration. It also uses proprietary algorithms to fuse all nine degrees of freedom for more reliable data. The sensor fusion with the gyroscope and the magnetometer provide absolute orientation to North as well as gyroscope stability. From this, we are able to use the Euler angles in position reconstruction. Yaw (rotation about the z-axis) and pitch (rotation about the y-axis) have ranges of 360 degrees, whereas roll (rotation about the x-axis) has a range of 180 degrees.
 
 \subsection{Filtering and Thresholding}
-  Once the LightBlue Bean has transmitted the IMU data, we must filter it because the on-chip sensor fusion is not accurate enough for position reconstruction. First, we noted that the IMU calibration was not always perfect. Figure 8a shows the raw data obtained from the IMU on a trial run when it is stationary. As seen by the green line in the plot, the data drifts and gets periodically recalibrated around once every 10 seconds. To solve this issue, we implemented a high pass filter by subtracting the reading from some mean value computed through a low-pass infinite impulse response (IIR) filter with a very low cutoff frequency. The high-pass filter eliminates this offset as seen in Figure 8b.
-\par Next, we implemented an IIR low pass filter, which significantly reduces the noise as shown in Figure 8c.
-  Lastly, we implemented acceleration thresholding: if the measured acceleration is under a certain threshold, we assume it is due to noise and ignore it. Unfortunately, this thresholding makes it difficult to recognize slow movement. Therefore, we require the user to write with fast movements. The effects are seen in Figure 8d.
+  Once the LightBlue Bean has transmitted the IMU data, we must filter it because the on-chip sensor fusion is not accurate enough for position reconstruction. First, we noted that the IMU calibration was not always perfect. Fig. 8a shows the raw data obtained from the IMU on a trial run when it is stationary. As seen by the green line in the plot, the data drifts and gets periodically recalibrated around once every 10 seconds. To solve this issue, we implemented a high pass filter by subtracting the reading from some mean value computed through a low-pass infinite impulse response (IIR) filter with a very low cutoff frequency. The high-pass filter eliminates this offset as seen in Fig. 8b.
+\par Next, we implemented an IIR low pass filter, which significantly reduces the noise as shown in Fig. 8c.
+  Lastly, we implemented acceleration thresholding: if the measured acceleration is under a certain threshold, we assume it is due to noise and ignore it. Unfortunately, this thresholding makes it difficult to recognize slow movement. Therefore, we require the user to write with fast movements. The effects are seen in Fig. 8d.
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/filtering}
   \caption{(a) Raw data from IMU; (b) Processed with high pass filter; (c) Processed with low pass filter; (d) Thresholded}
   \label{fig:filtering}
@@ -115,23 +115,22 @@ To digitize writing with IMU data, position reconstruction is developed using va
 
 \subsection{Transformation to Fixed Reference Frame}
   Since the acceleration data is provided in the IMU reference frame, we need to perform a change of basis to real world coordinates. The first position recorded is chosen to be the new fixed frame of reference. To perform this basis transformation, we used the Directional Cosine Matrix from [reference here]. $Q_G$ is the coordinate system from the fixed reference frame while $Q_P$ is the coordinate system from the IMU reference frame.
-  %% NATHAN DOUBLE CHECK THAT COORDINATE SYSTEM IS CORRECT TERM
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/dcm}
   \caption{Angles corresponding to the DCM [Premerlani and Bizard]}
   \label{fig:vel-adjust}
 \end{figure}
 
 \subsection{Velocity Adjustment}
-	We discovered that we needed to adjust velocity. When acceleration is near zero for some period of time, it is highly likely that the marker is stationary. The IMU data is imperfect. This causes the velocity to be nonzero as shown in Figure 10a, which shows velocity reconstruction for a step in the y-axis direction.
+	We discovered that we needed to adjust velocity. When acceleration is near zero for some period of time, it is highly likely that the marker is stationary. The IMU data is imperfect. This causes the velocity to be nonzero as shown in Fig. 10a, which shows velocity reconstruction for a step in the y-axis direction.
 \par To counter this issue, we assumed that if absolute acceleration is within some small bound for a set time, the velocity should be zero. Then we shift the velocity towards zero by comparing its current value to its value the first and last time the acceleration left the acceleration bounds near zero. Assuming $i$ is the index when the acceleration leaves the bounds and $j$ is the index when the acceleration enters the bounds, the velocity warping formula we used is shown below:
 $$v_{\text{adjusted}}[n] = v_{\text{unadjusted}}[n] - \left(\frac{n-i}{j-i}\right)^2 v_{\text{unadjusted}}[j]$$
-This algorithm is executed on the three axes of movements independent of each other. The resulting velocity is shown in Figure 10b.
+This algorithm is executed on the three axes of movements independent of each other. The resulting velocity is shown in Fig. 10b.
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/vel-adjust}
   \caption{(a) Velocity integrated from acceleration data; (b) After velocity adjustment}
   \label{fig:vel-adjust}
@@ -144,39 +143,40 @@ Because the IMU was mounted on the end cap of the casing, we used the Euler angl
   The position is plotted after reconstruction. We perform the post-processing every 20 data points to reduce latency since NumPy uses vector computations. If the force sensor is turned off during one of the last 20 data points, the plot is updated to include the last stroke. Although we reconstruct position for all transmitted data, we only plot when the force sensor is pressed. We also clear the position plot if button is pressed. 
 
 \section{Quantitative Analysis and Scheduling}
-Scheduling was another challenge we encountered. The Bean provides the Arduino serial library through a virtual serial port, but it has a limited data rate of approximately 67 Hz (1 sample every 15 ms). The worst case execution time (WCET) for each block of code is shown in Figure 11. Through this quantitative analysis, we discovered that sending data over Serial.println() was infeasible.
-   To make scheduling feasible, we switched from using Serial.println() to Serial.write() for sending BLE messages with a 64 byte maximum payload. Thus, we send five 12 byte custom data packets per payload. Once the IMU is calibrated, only data is sent. Until then, only calibration data is sent to the PC. As shown in Figure 12, this takes about 24 ms for each payload; however, every sixth packet is dropped. This is an acceptable error because the sampling rate is fast enough for our purposes. The inspiration for this is from FIFO buffering which sends data when capacity is reached.
-\par Additionally, the Bean’s RGB LED is controlled by the BLE module instead of the microcontroller, so it takes about 30 ms to set the LED color which is equivalent to two dropped data packets per LED setting. To solve this issue, we switched to the LED sequin, which only uses a digitalWrite(). 
-  
+Scheduling was another challenge we encountered. The Bean provides the Arduino serial library through a virtual serial port, but it has a very limited data rate. The worst case execution time (WCET) for each block of the most naive version of the Arduino code is shown in the Control Flow Graph (CFG) in Fig. 11. Through this quantitative analysis, we discovered that sending data over Serial.println() was infeasible since it converts numbers into numerical characters, and each order of magnitude takes a whole byte of character space. The timing was inferred by setting a digital output pin high before and low after a block of code. We used an oscilloscope to measure the time the digital output pin is high. This assumes that the time to write to the pins is negligible.
 \begin{figure}[h]
-  %\centering
-    \includegraphics[width=0.8\linewidth]{figures/cfg1}
-  \caption{CFG1}
+  \centering
+    \includegraphics[width=0.6\linewidth]{figures/cfg1}
+  \caption{CFG1: Naive implementation}
   \label{fig:cfg1}
 \end{figure}
+
+\par To make scheduling feasible, we switched from using Serial.println() to Serial.write() for sending bytes instead of characters. We discovered that the serial communication is implemented by sending 64 bytes of data in each message payload, so we send five 12 byte custom data packets per message. Once the IMU is calibrated, we send data packets with a set valid bit and assume the IMU will stay calibrated. Until then, only calibration data is sent to the PC. As shown in Fig. 12, this takes about 24 ms for each payload; however, every sixth packet is dropped since from a scheduling point of view one in every six tasks of getting the data and setting the buffer is infeasible due to the Serial.write() call. The function call cannot be preempted with reasonable effort, but this is an acceptable issue because the sampling rate is fast enough for our purposes. While waiting for enough data to send, the current data is pushed into a buffer which acts like a FIFO that triggers when capacity is reached and sends the data.
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=0.8\linewidth]{figures/cfg2}
-  \caption{cfg2}
+  \caption{CFG2: Optimized implementation}
   \label{fig:cfg2}
 \end{figure}
 
+\par Additionally, the Bean's RGB LED is controlled by the BLE module in the Bean instead of the microcontroller, so it takes about 30 ms to set the LED color which is equivalent to two dropped readings per LED setting. To solve this issue, we switched to the LED sequin, which only uses a digitalWrite() function call since it is a digital output pin controlled by the microcontroller. 
+  
 
 \subsection{Custom Data Packets}
-Each of our custom data packets contains 5 readings of 12 bits. The purpose of each bit can be seen in Figure 13. The valid bit is used to signify that the IMU is fully calibrated. Three bits are assigned to buttons and the force sensor depending on their on or off status. Each axis of acceleration has 12 bits encoded which adds up to 36 bits and allows for an acceleration range of -20.48 to 20.47 $m/s^2$. Sixteen bits are assigned to each axis of the Gyroscope to allow for a range of -180 to 180 degrees with 2 decimal places. The last eight bits are to help with detecting packet loss.
+Each of our custom data packets contains 5 readings of 12 bytes. The purpose of each bit can be seen in Fig. 13. The valid bit is used to signify that the IMU is fully calibrated. Three bits are assigned to buttons and the force sensor depending on their on or off status (one of these is unused in the current prototype). Each axis of acceleration has 12 bits encoded which allows for an acceleration range of -20.48 to 20.47 $m/s^2$ with 2 decimal places in each axis. Sixteen bits are assigned to each axis of the Gyroscope to allow for a range of -180 to 180 degrees with 2 decimal places. The last eight bits contain a counter to help with detecting packet loss during the reconstruction.
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/packet}
   		\caption{Custom Data Packet}
   	\label{fig:packet}
 \end{figure}
 
 \section{Mode of Operation}
-reWRITE is modeled by the hierarchical state machine in Figure 14. When reWRITE is turned on, it enters the ‘Calibration’ state. In this state, the IMU calibrates the accelerometer, gyroscope, and magnetometer, and prints each level of calibration. When all three sensors are calibrated, reWRITE preemptively transitions and enters the ‘Button’ state. Here, it waits for the user to press the button before starting position reconstruction. Once the button is pressed, reWRITE enters the ‘Data’ state. The nested state machine in ‘Data’ is also a hierarchical state machine. In ‘Data’, the system constantly receives new data and plots the reconstructed position. It performs calculations and plots by utilizing synchronous composition of state machines in the ‘Active’ state. One of the synchronous state machines executes the velocity calibration when the guard evaluates to true. Simultaneously, the other state machine plots the position when the marker presses the force sensor.
+reWRITE can be modeled by the hierarchical state machine in Fig. 14. When reWRITE is turned on, it enters the ‘Calibration’ state. In this state, the IMU calibrates the accelerometer, gyroscope, and magnetometer, and prints each level of calibration. When all three sensors are calibrated, reWRITE preemptively transitions and enters the ‘Button’ state. Here, it waits for the user to press the button before starting position reconstruction. Once the button is pressed, reWRITE enters the ‘Data’ state. The nested state machine in ‘Data’ is also a hierarchical state machine. In ‘Data’, the system constantly receives new data and plots the reconstructed position. It performs calculations and plots by utilizing synchronous composition of state machines in the ‘Active’ state. One of the synchronous state machines executes the velocity calibration when the guard evaluates to true. Simultaneously, the other state machine plots the position when the marker presses the force sensor.
 
 \begin{figure}[h]
-  %\centering
+  \centering
     \includegraphics[width=\linewidth]{figures/fsm}
   \caption{Finite State Machine}
   \label{fig:fsm}
