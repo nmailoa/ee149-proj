@@ -112,7 +112,7 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 \end{figure}
 
 \section{Position Reconstruction}
-To digitize writing with IMU data, we had to develop position reconstruction using various methods of post-processing. The reconstruction and plotting code is written in Python with NumPy and MatPlotLib libraries, and is provided in the appendix.
+To digitize writing with IMU data, position reconstruction is developed using various methods of post-processing. The reconstruction and plotting code is written in Python with NumPy and MatPlotLib libraries. The code is provided in the appendix.
 
 \subsection{IMU Sensor Data}
 	The Bosch IMU provides accelerometer, gyroscope, and magnetometer data. The on-chip Sensortec sensor fusion subtracts the gravity vector to provide linear acceleration. It also uses proprietary algorithms to fuse all nine degrees of freedom to provide more reliable data. The sensor fusion with the gyroscope and the magnetometer provide absolute orientation to North as well as gyroscope stability. From this, we are able to use the Euler angles in position reconstruction. Yaw (rotation about the z-axis) and pitch (rotation about the y-axis) have ranges of 360 degrees, whereas roll (rotation about the x-axis) has a range of 180 degrees.
