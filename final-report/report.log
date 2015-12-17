@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.8.23)  16 DEC 2015 21:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.8.23)  16 DEC 2015 21:57
 entering extended mode
 **report.tex
 (report.tex
@@ -23,13 +23,18 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 -- Using 8.5in x 11in (letter) paper.
 -- Using PDF output.
 \@IEEEnormalsizeunitybaselineskip=\dimen105
--- This is a 12 point document.
+-- This is a 10 point document.
 \CLASSINFOnormalsizebaselineskip=\dimen106
 \CLASSINFOnormalsizeunitybaselineskip=\dimen107
 \IEEEnormaljot=\dimen108
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <6> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <7> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
@@ -47,24 +52,24 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <10> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
 
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
+
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
 
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <14> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <17> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <20> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <20> not available
-(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
-
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <22> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1039.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <22> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1039.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24> not available
@@ -284,7 +289,7 @@ LaTeX Font Info:    ... okay on input line 5.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
 
--- Lines per column: 48 (approximate, difference = 11.17766pt).
+-- Lines per column: 56 (approximate, difference = 7.33757pt).
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -301,15 +306,15 @@ LaTeX Font Info:    ... okay on input line 5.
 * \textheight=679.33757pt
 * \oddsidemargin=-14.45378pt
 * \evensidemargin=-14.45378pt
-* \topmargin=-46.87779pt
+* \topmargin=-47.79578pt
 * \headheight=12.0pt
-* \headsep=20.42401pt
-* \topskip=13.92pt
-* \footskip=26.542pt
+* \headsep=21.342pt
+* \topskip=12.0pt
+* \footskip=25.80774pt
 * \marginparwidth=20.0pt
 * \marginparsep=10.0pt
 * \columnsep=12.0pt
-* \skip\footins=12.52791pt plus 5.5679pt minus 2.78395pt
+* \skip\footins=10.79993pt plus 4.79993pt minus 2.39996pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -378,110 +383,103 @@ Package pdftex.def Info: figures/bean.png used on input line 38.
 File: figures/imu.jpg Graphic file (type jpg)
 
 <use figures/imu.jpg>
-Package pdftex.def Info: figures/imu.jpg used on input line 50.
+Package pdftex.def Info: figures/imu.jpg used on input line 51.
 (pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
  [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
  <./figures/rewrite.png> <./figures/minion.png> <./figures/system.png> <./figur
-es/bean.png>]
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-
+es/bean.png> <./figures/imu.jpg>]
 <figures/battery.jpg, id=17, 602.25pt x 451.6875pt>
 File: figures/battery.jpg Graphic file (type jpg)
  <use figures/battery.jpg>
-Package pdftex.def Info: figures/battery.jpg used on input line 60.
+Package pdftex.def Info: figures/battery.jpg used on input line 61.
 (pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 
 <figures/force-sensor.jpg, id=18, 451.6875pt x 272.51813pt>
 File: figures/force-sensor.jpg Graphic file (type jpg)
 
 <use figures/force-sensor.jpg>
-Package pdftex.def Info: figures/force-sensor.jpg used on input line 70.
+Package pdftex.def Info: figures/force-sensor.jpg used on input line 71.
 (pdftex.def)             Requested size: 146.00024pt x 88.08913pt.
- [2 <./figures/imu.jpg> <./figures/battery.jpg> <./figures/force-sensor.jpg>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-<figures/3d-model.png, id=23, 202.7575pt x 159.59625pt>
+<figures/3d-model.png, id=19, 202.7575pt x 159.59625pt>
 File: figures/3d-model.png Graphic file (type png)
 
 <use figures/3d-model.png>
-Package pdftex.def Info: figures/3d-model.png used on input line 86.
+Package pdftex.def Info: figures/3d-model.png used on input line 87.
 (pdftex.def)             Requested size: 146.00024pt x 114.9238pt.
 
-<figures/3d-print.jpg, id=24, 602.25pt x 356.33125pt>
+<figures/3d-print.jpg, id=20, 602.25pt x 356.33125pt>
 File: figures/3d-print.jpg Graphic file (type jpg)
 
 <use figures/3d-print.jpg>
-Package pdftex.def Info: figures/3d-print.jpg used on input line 93.
+Package pdftex.def Info: figures/3d-print.jpg used on input line 94.
 (pdftex.def)             Requested size: 146.00024pt x 86.38031pt.
+ [2 <./figures/battery.jpg> <./figures/force-sensor.jpg> <./figures/3d-model.pn
+g> <./figures/3d-print.jpg>]
+<figures/filtering.png, id=26, 451.6875pt x 694.09312pt>
+File: figures/filtering.png Graphic file (type png)
+
+<use figures/filtering.png>
+Package pdftex.def Info: figures/filtering.png used on input line 111.
+(pdftex.def)             Requested size: 243.33128pt x 373.92566pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/filtering.png, id=25, 451.6875pt x 694.09312pt>
-File: figures/filtering.png Graphic file (type png)
-
-<use figures/filtering.png>
-Package pdftex.def Info: figures/filtering.png used on input line 110.
-(pdftex.def)             Requested size: 243.33128pt x 373.92566pt.
- [3 <./figures/3d-model.png> <./figures/3d-print.jpg>] <figures/dcm.png, id=30,
- 501.875pt x 393.97188pt>
+<figures/dcm.png, id=27, 501.875pt x 393.97188pt>
 File: figures/dcm.png Graphic file (type png)
  <use figures/dcm.png>
-Package pdftex.def Info: figures/dcm.png used on input line 120.
+Package pdftex.def Info: figures/dcm.png used on input line 122.
 (pdftex.def)             Requested size: 243.33128pt x 191.016pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/vel-adjust.png, id=31, 446.66875pt x 351.3125pt>
+<figures/vel-adjust.png, id=28, 446.66875pt x 351.3125pt>
 File: figures/vel-adjust.png Graphic file (type png)
 
 <use figures/vel-adjust.png>
-Package pdftex.def Info: figures/vel-adjust.png used on input line 133.
+Package pdftex.def Info: figures/vel-adjust.png used on input line 135.
 (pdftex.def)             Requested size: 243.33128pt x 191.38377pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[4 <./figures/filtering.png> <./figures/dcm.png>]
+[3 <./figures/filtering.png>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-<figures/cfg1.png, id=42, 479.7925pt x 439.6425pt>
+<figures/cfg1.png, id=38, 479.7925pt x 439.6425pt>
 File: figures/cfg1.png Graphic file (type png)
  <use figures/cfg1.png>
-Package pdftex.def Info: figures/cfg1.png used on input line 151.
+Package pdftex.def Info: figures/cfg1.png used on input line 153.
 (pdftex.def)             Requested size: 194.66576pt x 178.37624pt.
 
-<figures/cfg2.png, id=43, 480.79625pt x 619.31375pt>
+<figures/cfg2.png, id=39, 480.79625pt x 619.31375pt>
 File: figures/cfg2.png Graphic file (type png)
  <use figures/cfg2.png>
-Package pdftex.def Info: figures/cfg2.png used on input line 157.
+Package pdftex.def Info: figures/cfg2.png used on input line 159.
 (pdftex.def)             Requested size: 194.66576pt x 250.75455pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [5 <./figures/vel-adjust.png> <./figures/cfg1.png>]
-<figures/packet.png, id=49, 401.5pt x 71.26625pt>
+ [4 <./figures/dcm.png> <./figures/vel-adjust.png> <./figures/cfg1.png>]
+<figures/packet.png, id=46, 401.5pt x 71.26625pt>
 File: figures/packet.png Graphic file (type png)
  <use figures/packet.png>
-Package pdftex.def Info: figures/packet.png used on input line 168.
+Package pdftex.def Info: figures/packet.png used on input line 170.
 (pdftex.def)             Requested size: 243.33128pt x 43.19177pt.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
@@ -520,19 +518,13 @@ Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-<figures/fsm.png, id=50, 847.165pt x 641.39626pt>
+<figures/fsm.png, id=47, 847.165pt x 641.39626pt>
 File: figures/fsm.png Graphic file (type png)
  <use figures/fsm.png>
-Package pdftex.def Info: figures/fsm.png used on input line 178.
+Package pdftex.def Info: figures/fsm.png used on input line 180.
 (pdftex.def)             Requested size: 243.33128pt x 184.22871pt.
 
-Overfull \hbox (25.74342pt too wide) in paragraph at lines 185--197
-[][] 
- []
-
-[6 <./figures/cfg2.png> <./figures/packet.png> <./figures/fsm.png>] [7
-
-]
+[5 <./figures/cfg2.png> <./figures/packet.png> <./figures/fsm.png>]
 ("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
@@ -543,76 +535,71 @@ LaTeX Font Info:    Try loading font information for OML+ptm on input line 1.
 ("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\omlptm.fd"
 File: omlptm.fd 
 )
-LaTeX Font Info:    Font shape `OML/ptm/m/n' in size <10> not available
+LaTeX Font Info:    Font shape `OML/ptm/m/n' in size <9> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 1.
 LaTeX Font Info:    Try loading font information for OMS+ptm on input line 20.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\omsptm.fd"
 File: omsptm.fd 
 )
-LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <9> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 20.
- [8
+ [6
 
 ]
-LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <10> not available
+LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <9> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 76.
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7])
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
+File: lstlang1.sty 2015/06/04 1.6 listings language file
+) (draw.py
+[8]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [9]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [10])
-("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
-File: lstlang1.sty 2015/06/04 1.6 listings language file
-) (draw.py
-[11]
+ [10]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [11]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [12]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [13]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [14]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [15]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [16]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [17])
-[18] (report.aux)
+ [13])
+[14] (report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5134 strings out of 493673
- 73873 string characters out of 3143951
- 370544 words of memory out of 3000000
- 8419 multiletter control sequences out of 15000+200000
- 36960 words of font info for 74 fonts, out of 3000000 for 9000
+ 5133 strings out of 493673
+ 73877 string characters out of 3143951
+ 428383 words of memory out of 3000000
+ 8421 multiletter control sequences out of 15000+200000
+ 36854 words of font info for 73 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 29i,6n,52p,1021b,1698s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 30i,6n,52p,1021b,1656s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
 s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/fon
-ts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmmi8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
-msfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/c
-m/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.p
-fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Pr
-ogram Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTe
-X 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
-/urw/times/utmri8a.pfb>
-Output written on report.pdf (18 pages, 2545673 bytes).
+ts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmmi9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
+/cmr7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pf
+b><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Pro
+gram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Program File
+s/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/font
+s/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times
+/utmri8a.pfb>
+Output written on report.pdf (14 pages, 2546736 bytes).
 PDF statistics:
- 134 PDF objects out of 1000 (max. 8388607)
+ 126 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 
