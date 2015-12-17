@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  17 DEC 2015 01:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  17 DEC 2015 11:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -418,21 +418,6 @@ File: figures/minion.png Graphic file (type png)
 <use figures/minion.png>
 Package pdftex.def Info: figures/minion.png used on input line 17.
 (pdftex.def)             Requested size: 224.39664pt x 55.45744pt.
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
  <figures/system.png, id=4, 401.5pt x 216.81pt>
 File: figures/system.png Graphic file (type png)
 
@@ -455,12 +440,6 @@ File: figures/imu.jpg Graphic file (type jpg)
 <use figures/imu.jpg>
 Package pdftex.def Info: figures/imu.jpg used on input line 53.
 (pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
  <figures/battery.jpg, id=18, 602.25pt x 451.6875pt>
 File: figures/battery.jpg Graphic file (type jpg)
 
@@ -477,9 +456,6 @@ File: figures/force-sensor.jpg Graphic file (type jpg)
 <use figures/force-sensor.jpg>
 Package pdftex.def Info: figures/force-sensor.jpg used on input line 73.
 (pdftex.def)             Requested size: 146.00024pt x 88.08913pt.
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
 
 <figures/3d-model.png, id=20, 202.7575pt x 159.59625pt>
 File: figures/3d-model.png Graphic file (type png)
@@ -545,37 +521,19 @@ Missing character: There is no € in font ptmr7t!
 Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
 Missing character: There is no ˜ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ˜ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ˜ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
 
 <figures/fsm.png, id=48, 847.165pt x 641.39626pt>
 File: figures/fsm.png Graphic file (type png)
@@ -662,7 +620,7 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2014/texm
 f-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2014/texmf-dist/fon
 ts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on report.pdf (15 pages, 2534925 bytes).
+Output written on report.pdf (15 pages, 2534947 bytes).
 PDF statistics:
  131 PDF objects out of 1000 (max. 8388607)
  73 compressed objects within 1 object stream
