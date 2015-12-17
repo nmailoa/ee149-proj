@@ -118,8 +118,8 @@ To digitize writing with IMU data, position reconstruction is developed using va
 	The Bosch IMU provides accelerometer, gyroscope, and magnetometer data. The on-chip Sensortec sensor fusion subtracts the gravity vector to provide linear acceleration. It also uses proprietary algorithms to fuse all nine degrees of freedom to provide more reliable data. The sensor fusion with the gyroscope and the magnetometer provide absolute orientation to North as well as gyroscope stability. From this, we are able to use the Euler angles in position reconstruction. Yaw (rotation about the z-axis) and pitch (rotation about the y-axis) have ranges of 360 degrees, whereas roll (rotation about the x-axis) has a range of 180 degrees.
 
 \subsection{Filtering and Thresholding}
-  Once the LightBlue Bean has transmitted the IMU data, we must filter it because the on-chip sensor fusion is not accurate enough for position reconstruction. First, we noted that the IMU calibration was not always perfect. Figure 8a shows the raw data obtained from the IMU on a trial run when it is stationary. As seen by the green line in the plot, the data drifts and gets periodically recalibrated around once every 10 seconds. To solve this issue, we implemented a high pass filter by subtracting the reading away from some mean value computed through a low-pass infinite impulse response (IIR) filter with a very low cutoff frequency. The high-pass filter eliminates this offset as seen in figure 8b.
-  Next, we implemented an IIR low pass filter, which significantly reduces the noise as shown in figure 8c.
+  Once the LightBlue Bean has transmitted the IMU data, we must filter it because the on-chip sensor fusion is not accurate enough for position reconstruction. First, we noted that the IMU calibration was not always perfect. Figure 8a shows the raw data obtained from the IMU on a trial run when it is stationary. As seen by the green line in the plot, the data drifts and gets periodically recalibrated around once every 10 seconds. To solve this issue, we implemented a high pass filter by subtracting the reading away from some mean value computed through a low-pass infinite impulse response (IIR) filter with a very low cutoff frequency. The high-pass filter eliminates this offset as seen in Figure 8b.
+  Next, we implemented an IIR low pass filter, which significantly reduces the noise as shown in Figure 8c.
   Lastly, we implemented acceleration thresholding: if the measured acceleration is under a certain threshold, we assume it is due to noise and ignore it. Unfortunately, this thresholding makes it difficult to recognize slow movement. Therefore, we require the user to write with fast movements. The effects are seen in Figure 8d.
 \begin{figure}[h]
   \centering
@@ -129,7 +129,7 @@ To digitize writing with IMU data, position reconstruction is developed using va
 \end{figure}
 
 \subsection{Transformation to Fixed Reference Frame}
-	Since the acceleration data provided is in the frame of reference of the IMU, we needed to perform a change of basis to real world coordinates. The fixed frame of reference is chosen to be the first position recorded. To perform this basis transformation, we used the Directional Cosine Matrix from [reference here]. QG is the coordinates from the fixed reference frame while QP is the coordinates from the IMU reference frame.
+  Since the acceleration data is provided in the IMU reference frame, we need to perform a change of basis to real world coordinates. The first position recorded is chosen to be the new fixed frame of reference. To perform this basis transformation, we used the Directional Cosine Matrix from [reference here]. $Q_G$ is the coordinates from the fixed reference frame while $Q_P$ is the coordinates from the IMU reference frame.
 
 \begin{figure}[h]
   \centering
