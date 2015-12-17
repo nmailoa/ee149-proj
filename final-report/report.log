@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  17 DEC 2015 00:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  17 DEC 2015 01:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -270,7 +270,10 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
 LaTeX Info: Redefining \[ on input line 2665.
 LaTeX Info: Redefining \] on input line 2666.
 )
-(./report.aux
+(/usr/local/texlive/2014/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+) (./report.aux
 
 LaTeX Warning: Label `fig:system' multiply defined.
 
@@ -415,46 +418,64 @@ File: figures/minion.png Graphic file (type png)
 <use figures/minion.png>
 Package pdftex.def Info: figures/minion.png used on input line 17.
 (pdftex.def)             Requested size: 224.39664pt x 55.45744pt.
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
  <figures/system.png, id=4, 401.5pt x 216.81pt>
 File: figures/system.png Graphic file (type png)
 
 <use figures/system.png>
-Package pdftex.def Info: figures/system.png used on input line 27.
+Package pdftex.def Info: figures/system.png used on input line 31.
 (pdftex.def)             Requested size: 243.33128pt x 131.40038pt.
  <figures/bean.png, id=5, 589.20125pt x 272.01625pt>
 File: figures/bean.png Graphic file (type png)
 
 <use figures/bean.png>
-Package pdftex.def Info: figures/bean.png used on input line 38.
+Package pdftex.def Info: figures/bean.png used on input line 40.
 (pdftex.def)             Requested size: 194.66576pt x 89.8694pt.
- <figures/imu.jpg, id=6, 602.25pt x 451.6875pt>
-File: figures/imu.jpg Graphic file (type jpg)
-
-<use figures/imu.jpg>
-Package pdftex.def Info: figures/imu.jpg used on input line 51.
-(pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
  [1{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
  <./figures/rewrite.png> <./figures/minion.png> <./figures/system.png> <./figur
-es/bean.png> <./figures/imu.jpg>]
-<figures/battery.jpg, id=18, 602.25pt x 451.6875pt>
-File: figures/battery.jpg Graphic file (type jpg)
- <use figures/battery.jpg>
-Package pdftex.def Info: figures/battery.jpg used on input line 61.
+es/bean.png>] <figures/imu.jpg, id=17, 602.25pt x 451.6875pt>
+File: figures/imu.jpg Graphic file (type jpg)
+
+<use figures/imu.jpg>
+Package pdftex.def Info: figures/imu.jpg used on input line 53.
 (pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+ <figures/battery.jpg, id=18, 602.25pt x 451.6875pt>
+File: figures/battery.jpg Graphic file (type jpg)
+
+<use figures/battery.jpg>
+Package pdftex.def Info: figures/battery.jpg used on input line 63.
+(pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 <figures/force-sensor.jpg, id=19, 451.6875pt x 272.51813pt>
 File: figures/force-sensor.jpg Graphic file (type jpg)
 
 <use figures/force-sensor.jpg>
-Package pdftex.def Info: figures/force-sensor.jpg used on input line 71.
+Package pdftex.def Info: figures/force-sensor.jpg used on input line 73.
 (pdftex.def)             Requested size: 146.00024pt x 88.08913pt.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
@@ -464,67 +485,60 @@ Missing character: There is no ™ in font ptmr7t!
 File: figures/3d-model.png Graphic file (type png)
 
 <use figures/3d-model.png>
-Package pdftex.def Info: figures/3d-model.png used on input line 87.
+Package pdftex.def Info: figures/3d-model.png used on input line 89.
 (pdftex.def)             Requested size: 146.00024pt x 114.9238pt.
-
-<figures/3d-print.jpg, id=21, 602.25pt x 356.33125pt>
+ [2 <./figures/imu.jpg> <./figures/battery.jpg> <./figures/force-sensor.jpg>] <
+figures/3d-print.jpg, id=25, 602.25pt x 356.33125pt>
 File: figures/3d-print.jpg Graphic file (type jpg)
 
 <use figures/3d-print.jpg>
-Package pdftex.def Info: figures/3d-print.jpg used on input line 94.
+Package pdftex.def Info: figures/3d-print.jpg used on input line 96.
 (pdftex.def)             Requested size: 146.00024pt x 86.38031pt.
- [2 <./figures/battery.jpg> <./figures/force-sensor.jpg> <./figures/3d-model.pn
-g> <./figures/3d-print.jpg>]
-<figures/filtering.png, id=27, 451.6875pt x 694.09312pt>
+
+<figures/filtering.png, id=26, 451.6875pt x 694.09312pt>
 File: figures/filtering.png Graphic file (type png)
 
 <use figures/filtering.png>
-Package pdftex.def Info: figures/filtering.png used on input line 111.
-(pdftex.def)             Requested size: 243.33128pt x 373.92566pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<figures/dcm.png, id=28, 501.875pt x 393.97188pt>
+Package pdftex.def Info: figures/filtering.png used on input line 113.
+(pdftex.def)             Requested size: 218.99666pt x 336.52885pt.
+ <figures/dcm.png, id=27, 501.875pt x 393.97188pt>
 File: figures/dcm.png Graphic file (type png)
- <use figures/dcm.png>
-Package pdftex.def Info: figures/dcm.png used on input line 121.
+
+<use figures/dcm.png>
+Package pdftex.def Info: figures/dcm.png used on input line 123.
 (pdftex.def)             Requested size: 243.33128pt x 191.016pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/vel-adjust.png, id=29, 446.66875pt x 351.3125pt>
+[3 <./figures/3d-model.png> <./figures/3d-print.jpg> <./figures/filtering.png>]
+<figures/vel-adjust.png, id=35, 446.66875pt x 351.3125pt>
 File: figures/vel-adjust.png Graphic file (type png)
 
 <use figures/vel-adjust.png>
-Package pdftex.def Info: figures/vel-adjust.png used on input line 134.
-(pdftex.def)             Requested size: 243.33128pt x 191.38377pt.
+Package pdftex.def Info: figures/vel-adjust.png used on input line 136.
+(pdftex.def)             Requested size: 218.99666pt x 172.24648pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[3 <./figures/filtering.png>]
-<figures/cfg1.png, id=39, 479.7925pt x 439.6425pt>
+<figures/cfg1.png, id=36, 479.7925pt x 439.6425pt>
 File: figures/cfg1.png Graphic file (type png)
  <use figures/cfg1.png>
-Package pdftex.def Info: figures/cfg1.png used on input line 149.
+Package pdftex.def Info: figures/cfg1.png used on input line 151.
 (pdftex.def)             Requested size: 146.00024pt x 133.77882pt.
 
-<figures/cfg2.png, id=40, 480.79625pt x 619.31375pt>
+<figures/cfg2.png, id=37, 480.79625pt x 619.31375pt>
 File: figures/cfg2.png Graphic file (type png)
  <use figures/cfg2.png>
-Package pdftex.def Info: figures/cfg2.png used on input line 157.
+Package pdftex.def Info: figures/cfg2.png used on input line 159.
 (pdftex.def)             Requested size: 194.66576pt x 250.75455pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
 
 [4 <./figures/dcm.png> <./figures/vel-adjust.png> <./figures/cfg1.png>]
 <figures/packet.png, id=47, 401.5pt x 71.26625pt>
 File: figures/packet.png Graphic file (type png)
  <use figures/packet.png>
-Package pdftex.def Info: figures/packet.png used on input line 170.
+Package pdftex.def Info: figures/packet.png used on input line 172.
 (pdftex.def)             Requested size: 243.33128pt x 43.19177pt.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
@@ -566,13 +580,14 @@ Missing character: There is no ™ in font ptmr7t!
 <figures/fsm.png, id=48, 847.165pt x 641.39626pt>
 File: figures/fsm.png Graphic file (type png)
  <use figures/fsm.png>
-Package pdftex.def Info: figures/fsm.png used on input line 180.
+Package pdftex.def Info: figures/fsm.png used on input line 182.
 (pdftex.def)             Requested size: 243.33128pt x 184.22871pt.
 
+Underfull \vbox (badness 2111) has occurred while \output is active []
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+ [5 <./figures/cfg2.png> <./figures/packet.png> <./figures/fsm.png>] [6
 
-[5 <./figures/cfg2.png> <./figures/packet.png> <./figures/fsm.png>]
+]
 (/usr/local/texlive/2014/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/03/04 1.5c listings language file
 )
@@ -594,7 +609,7 @@ File: omsptm.fd
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <9> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 20.
- [6
+ [7
 
 ]
 LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <9> not available
@@ -602,13 +617,10 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <9> not available
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7])
+ [8])
 (/usr/local/texlive/2014/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/03/04 1.5c listings language file
-) (./draw.py [8]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [9]
+) (./draw.py [9]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [10]
@@ -620,17 +632,20 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [12]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [13])
-[14] (./report.aux)
+ [13]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [14])
+[15] (./report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5476 strings out of 493117
- 80639 string characters out of 6135433
- 436058 words of memory out of 5000000
- 8853 multiletter control sequences out of 15000+600000
+ 5548 strings out of 493117
+ 81523 string characters out of 6135433
+ 437140 words of memory out of 5000000
+ 8921 multiletter control sequences out of 15000+600000
  36854 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,6n,52p,1044b,1654s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -647,10 +662,10 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2014/texm
 f-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2014/texmf-dist/fon
 ts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on report.pdf (14 pages, 2532127 bytes).
+Output written on report.pdf (15 pages, 2534925 bytes).
 PDF statistics:
- 128 PDF objects out of 1000 (max. 8388607)
- 71 compressed objects within 1 object stream
+ 131 PDF objects out of 1000 (max. 8388607)
+ 73 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

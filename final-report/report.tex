@@ -1,6 +1,6 @@
 \documentclass[10pt,journal]{IEEEtran}
 \usepackage[letterpaper, margin=0.8in]{geometry}
-\usepackage{framed, listings, graphicx, float, amsmath}
+\usepackage{framed, listings, graphicx, float, amsmath,url}
 
 \begin{document}
 
@@ -18,7 +18,11 @@ Reia Cho, CJ Geering, Nathaniel Mailoa, Rachel Zhang
 
 
 \section{Introduction}
-INSERT TEXT HERE
+\par Slept through lecture again? Studying for an exam but can’t remember what the professor wrote during class? Can’t make out what the professor is writing from the back of the classroom? Need to work out a problem on pen and paper over a Skype call? Have no fear, reWRITE is here!
+\par reWRITE is a writing utensil attachment that aims to digitize your handwriting in a self-contained, easy-to-implement, and cost effective manner. Digitizing handwriting is currently a challenging open-problem with no single solution. Currently, there exists a handful of solutions, each with their own benefits and tradeoffs. Perhaps the most prevalent prior art makes use of an infrared tracking system; the writing utensil is equipped an IR transmitter whose signal is received by a distant IR camera elsewhere in the room. The main drawback with this type of system is that it lacks self-containment.
+\par reWRITE is designed specifically for a classroom or presentation scenario, environments that demand mobility and easy setup. Thus, we decided to forego an IR implementation, opting to use a single Inertial Measurement Unit (IMU) instead. By having all sensors onboard, reWRITE is one single unit with no need to setup a receiver or projector. Additionally, reWRITE is completely wireless, both power and communication.
+\par reWRITE interprets IMU data and provides both real-time and historical handwriting data. Historical data can be synced up with a lecture webcast so you can view a professor’s handwriting in tandem with the webcast. The webcast and handwriting can then be revisited at any time in the future. Real-time data can be livestreamed using free streaming services such as YouTube and Twitch.tv. So if you’re visually impaired or having trouble reading the whiteboard, open up the stream to see the professor’s handwriting at any size. The uses of reWRITE extend beyond the lecture setting. reWRITE can be used during a conference call to provide a common medium to exchange handwritten notes through. Lastly, since reWRITE is 3D printed, it is highly customizable to fit your needs.
+\par A demo of the reWRITE can be found in \textit{\url{https://youtu.be/FYBg0k001e8}}.
 
 \section{System}
 
@@ -28,8 +32,6 @@ INSERT TEXT HERE
   \caption{reWRITE system}
   \label{fig:system}
 \end{figure}
-
-INSERT TEXT HERE
 
 \subsection{LightBlue Bean}
 
@@ -56,7 +58,7 @@ The LightBlue Bean is a more reasonable platform. The Bean has an 8MHz ATMega328
 \par When the device is initially powered, it must be calibrated. Each sensor is calibrated separately by the onboard microcontroller and a register in the device stores the calibration status for each sensor out of 3. The gyroscope is calibrated by keeping the IMU stationary. The magnetometer is calibrated by drawing a figure eight. To calibrate the accelerometer, the IMU must be stationary for a few seconds in various orientations. Overall, the three sensors take about 30 to 60 seconds to calibrate. To help with calibration, we use the Bean’s RGB LED to signify the calibration status. Even after the IMU is fully calibrated, it is still not perfect, which we will discuss in the position reconstruction section.
 \subsection{Li-Ion Battery}
 
-\begin{figure}[H]
+\begin{figure}[h]
   \centering
     \includegraphics[width=0.6\linewidth]{figures/battery}
   \caption{3.7V 150mAh Li-Ion battery}
@@ -108,13 +110,13 @@ To digitize writing with IMU data, position reconstruction is developed using va
   Lastly, we implemented acceleration thresholding: if the measured acceleration is under a certain threshold, we assume it is due to noise and ignore it. Unfortunately, this thresholding makes it difficult to recognize slow movement. Therefore, we require the user to write with fast movements. The effects are seen in Fig. 8d.
 \begin{figure}[h]
   \centering
-    \includegraphics[width=\linewidth]{figures/filtering}
+    \includegraphics[width=0.9\linewidth]{figures/filtering}
   \caption{(a) Raw data from IMU; (b) Processed with high pass filter; (c) Processed with low pass filter; (d) Thresholded}
   \label{fig:filtering}
 \end{figure}
 
 \subsection{Transformation to Fixed Reference Frame}
-  Since the acceleration data is provided in the IMU reference frame, we need to perform a change of basis to real world coordinates. The first position recorded is chosen to be the new fixed frame of reference. To perform this basis transformation, we used the Directional Cosine Matrix from [reference here]. $Q_G$ is the coordinate system from the fixed reference frame while $Q_P$ is the coordinate system from the IMU reference frame.
+  Since the acceleration data is provided in the IMU reference frame, we need to perform a change of basis to real world coordinates. The first position recorded is chosen to be the new fixed frame of reference. To perform this basis transformation, we used the Directional Cosine Matrix from \cite{PB}. $Q_G$ is the coordinate system from the fixed reference frame while $Q_P$ is the coordinate system from the IMU reference frame.
 
 \begin{figure}[h]
   \centering
@@ -131,7 +133,7 @@ This algorithm is executed on the three axes of movements independent of each ot
 
 \begin{figure}[h]
   \centering
-    \includegraphics[width=\linewidth]{figures/vel-adjust}
+    \includegraphics[width=0.9\linewidth]{figures/vel-adjust}
   \caption{(a) Velocity integrated from acceleration data; (b) After velocity adjustment}
   \label{fig:vel-adjust}
 \end{figure}
@@ -147,7 +149,7 @@ Scheduling was another challenge we encountered. The Bean provides the Arduino s
 \begin{figure}[h]
   \centering
     \includegraphics[width=0.6\linewidth]{figures/cfg1}
-  \caption{CFG1: Naive implementation}
+  \caption{CFG1: Naive implementation of microcontroller code with Serial.println()}
   \label{fig:cfg1}
 \end{figure}
 
@@ -155,7 +157,7 @@ Scheduling was another challenge we encountered. The Bean provides the Arduino s
 \begin{figure}[h]
   \centering
     \includegraphics[width=0.8\linewidth]{figures/cfg2}
-  \caption{CFG2: Optimized implementation}
+  \caption{CFG2: Optimized implementation of microcontroller code with Serial.write() and custom data packets}
   \label{fig:cfg2}
 \end{figure}
 
@@ -163,7 +165,7 @@ Scheduling was another challenge we encountered. The Bean provides the Arduino s
   
 
 \subsection{Custom Data Packets}
-Each of our custom data packets contains 5 readings of 12 bytes. The purpose of each bit can be seen in Fig. 13. The valid bit is used to signify that the IMU is fully calibrated. Three bits are assigned to buttons and the force sensor depending on their on or off status (one of these is unused in the current prototype). Each axis of acceleration has 12 bits encoded which allows for an acceleration range of -20.48 to 20.47 $m/s^2$ with 2 decimal places in each axis. Sixteen bits are assigned to each axis of the Gyroscope to allow for a range of -180 to 180 degrees with 2 decimal places. The last eight bits contain a counter to help with detecting packet loss during the reconstruction.
+Each of our custom data packets contains 5 readings of 12 bytes. The purpose of each bit can be seen in Fig. 13. The valid bit is used to signify that the IMU is fully calibrated. Three bits are assigned to buttons and the force sensor depending on their on or off status (one of these is unused in the current prototype). Each axis of acceleration has 12 bits encoded which allows for an acceleration range of -20.48 to 20.47 $m/s^2$ with 2 decimal places in each axis. Sixteen bits are assigned to each axis of the Gyroscope to allow for a range of -180.00 to 180.00 degrees with 2 decimal places. The last eight bits contain a counter to help with detecting packet loss during the reconstruction.
 
 \begin{figure}[h]
   \centering
