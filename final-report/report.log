@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.8.23)  16 DEC 2015 19:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.8.23)  16 DEC 2015 21:14
 entering extended mode
 **report.tex
 (report.tex
@@ -362,33 +362,32 @@ File: figures/minion.png Graphic file (type png)
 <use figures/minion.png>
 Package pdftex.def Info: figures/minion.png used on input line 17.
 (pdftex.def)             Requested size: 224.39664pt x 55.45744pt.
-
-Overfull \hbox (13.74342pt too wide) in paragraph at lines 26--38
- [][] 
- []
-
-<figures/system.png, id=4, 401.5pt x 216.81pt>
+ <figures/system.png, id=4, 401.5pt x 216.81pt>
 File: figures/system.png Graphic file (type png)
- <use figures/system.png>
-Package pdftex.def Info: figures/system.png used on input line 43.
+
+<use figures/system.png>
+Package pdftex.def Info: figures/system.png used on input line 27.
 (pdftex.def)             Requested size: 243.33128pt x 131.40038pt.
-
-<figures/bean.png, id=5, 602.25pt x 314.17375pt>
+ <figures/bean.png, id=5, 602.25pt x 314.17375pt>
 File: figures/bean.png Graphic file (type png)
- <use figures/bean.png>
-Package pdftex.def Info: figures/bean.png used on input line 54.
-(pdftex.def)             Requested size: 194.66576pt x 101.54916pt.
 
-[1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
+<use figures/bean.png>
+Package pdftex.def Info: figures/bean.png used on input line 38.
+(pdftex.def)             Requested size: 194.66576pt x 101.54916pt.
+ <figures/imu.jpg, id=6, 602.25pt x 451.6875pt>
+File: figures/imu.jpg Graphic file (type jpg)
+
+<use figures/imu.jpg>
+Package pdftex.def Info: figures/imu.jpg used on input line 50.
+(pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
  <./figures/rewrite.png> <./figures/minion.png> <./figures/system.png> <./figur
 es/bean.png>]
-<figures/imu.jpg, id=16, 602.25pt x 451.6875pt>
-File: figures/imu.jpg Graphic file (type jpg)
- <use figures/imu.jpg>
-Package pdftex.def Info: figures/imu.jpg used on input line 66.
-(pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
@@ -399,70 +398,91 @@ Missing character: There is no ™ in font ptmr7t!
 <figures/battery.jpg, id=17, 602.25pt x 451.6875pt>
 File: figures/battery.jpg Graphic file (type jpg)
  <use figures/battery.jpg>
-Package pdftex.def Info: figures/battery.jpg used on input line 77.
+Package pdftex.def Info: figures/battery.jpg used on input line 60.
 (pdftex.def)             Requested size: 146.00024pt x 109.49617pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 
 <figures/force-sensor.jpg, id=18, 451.6875pt x 272.51813pt>
 File: figures/force-sensor.jpg Graphic file (type jpg)
 
 <use figures/force-sensor.jpg>
-Package pdftex.def Info: figures/force-sensor.jpg used on input line 88.
+Package pdftex.def Info: figures/force-sensor.jpg used on input line 70.
 (pdftex.def)             Requested size: 146.00024pt x 88.08913pt.
  [2 <./figures/imu.jpg> <./figures/battery.jpg> <./figures/force-sensor.jpg>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-<figures/3d-model.png, id=22, 202.7575pt x 159.59625pt>
+<figures/3d-model.png, id=23, 202.7575pt x 159.59625pt>
 File: figures/3d-model.png Graphic file (type png)
 
 <use figures/3d-model.png>
-Package pdftex.def Info: figures/3d-model.png used on input line 105.
+Package pdftex.def Info: figures/3d-model.png used on input line 86.
 (pdftex.def)             Requested size: 146.00024pt x 114.9238pt.
 
-<figures/3d-print.jpg, id=23, 602.25pt x 356.33125pt>
+<figures/3d-print.jpg, id=24, 602.25pt x 356.33125pt>
 File: figures/3d-print.jpg Graphic file (type jpg)
 
 <use figures/3d-print.jpg>
-Package pdftex.def Info: figures/3d-print.jpg used on input line 112.
+Package pdftex.def Info: figures/3d-print.jpg used on input line 93.
 (pdftex.def)             Requested size: 146.00024pt x 86.38031pt.
 
-<figures/filtering.png, id=24, 451.6875pt x 694.09312pt>
-File: figures/filtering.png Graphic file (type png)
-
-<use figures/filtering.png>
-Package pdftex.def Info: figures/filtering.png used on input line 131.
-(pdftex.def)             Requested size: 243.33128pt x 373.92566pt.
- [3 <./figures/3d-model.png> <./figures/3d-print.jpg>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<figures/dcm.png, id=29, 501.875pt x 393.97188pt>
+<figures/filtering.png, id=25, 451.6875pt x 694.09312pt>
+File: figures/filtering.png Graphic file (type png)
+
+<use figures/filtering.png>
+Package pdftex.def Info: figures/filtering.png used on input line 110.
+(pdftex.def)             Requested size: 243.33128pt x 373.92566pt.
+ [3 <./figures/3d-model.png> <./figures/3d-print.jpg>] <figures/dcm.png, id=30,
+ 501.875pt x 393.97188pt>
 File: figures/dcm.png Graphic file (type png)
  <use figures/dcm.png>
-Package pdftex.def Info: figures/dcm.png used on input line 141.
+Package pdftex.def Info: figures/dcm.png used on input line 120.
 (pdftex.def)             Requested size: 243.33128pt x 191.016pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[4 <./figures/filtering.png>]
-<figures/vel-adjust.png, id=39, 446.66875pt x 351.3125pt>
+<figures/vel-adjust.png, id=31, 446.66875pt x 351.3125pt>
 File: figures/vel-adjust.png Graphic file (type png)
 
 <use figures/vel-adjust.png>
-Package pdftex.def Info: figures/vel-adjust.png used on input line 154.
+Package pdftex.def Info: figures/vel-adjust.png used on input line 133.
 (pdftex.def)             Requested size: 243.33128pt x 191.38377pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[4 <./figures/filtering.png> <./figures/dcm.png>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
- [5 <./figures/dcm.png> <./figures/vel-adjust.png>]
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
+
+<figures/cfg1.png, id=42, 479.7925pt x 439.6425pt>
+File: figures/cfg1.png Graphic file (type png)
+ <use figures/cfg1.png>
+Package pdftex.def Info: figures/cfg1.png used on input line 151.
+(pdftex.def)             Requested size: 194.66576pt x 178.37624pt.
+
+<figures/cfg2.png, id=43, 480.79625pt x 619.31375pt>
+File: figures/cfg2.png Graphic file (type png)
+ <use figures/cfg2.png>
+Package pdftex.def Info: figures/cfg2.png used on input line 157.
+(pdftex.def)             Requested size: 194.66576pt x 250.75455pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5 <./figures/vel-adjust.png> <./figures/cfg1.png>]
+<figures/packet.png, id=49, 401.5pt x 71.26625pt>
+File: figures/packet.png Graphic file (type png)
+ <use figures/packet.png>
+Package pdftex.def Info: figures/packet.png used on input line 168.
+(pdftex.def)             Requested size: 243.33128pt x 43.19177pt.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ˜ in font ptmr7t!
@@ -499,7 +519,21 @@ Missing character: There is no ˜ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
-[6] ("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
+
+<figures/fsm.png, id=50, 847.165pt x 641.39626pt>
+File: figures/fsm.png Graphic file (type png)
+ <use figures/fsm.png>
+Package pdftex.def Info: figures/fsm.png used on input line 178.
+(pdftex.def)             Requested size: 243.33128pt x 184.22871pt.
+
+Overfull \hbox (25.74342pt too wide) in paragraph at lines 185--197
+[][] 
+ []
+
+[6 <./figures/cfg2.png> <./figures/packet.png> <./figures/fsm.png>] [7
+
+]
+("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
 ("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstmisc.sty"
@@ -518,7 +552,7 @@ File: omsptm.fd
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 20.
- [7
+ [8
 
 ]
 LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <10> not available
@@ -526,17 +560,14 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <10> not available
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [8]
+ [9]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [9])
+ [10])
 ("C:\Program Files\MiKTeX 2.9\tex\latex\listings\lstlang1.sty"
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 ) (draw.py
-[10]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [11]
+[11]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [12]
@@ -551,33 +582,37 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [15]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [16])
-[17] (report.aux)
+ [16]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [17])
+[18] (report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5110 strings out of 493673
- 73463 string characters out of 3143951
- 370282 words of memory out of 3000000
- 8399 multiletter control sequences out of 15000+200000
+ 5134 strings out of 493673
+ 73873 string characters out of 3143951
+ 370544 words of memory out of 3000000
+ 8419 multiletter control sequences out of 15000+200000
  36960 words of font info for 74 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 29i,6n,52p,1093b,1698s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 29i,6n,52p,1021b,1698s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
 s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/fon
 ts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
-msfonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
-/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.p
-fb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Fi
-les/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fo
-nts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (17 pages, 1864969 bytes).
+/public/amsfonts/cm/cmmi8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
+msfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/c
+m/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
+/urw/times/utmri8a.pfb>
+Output written on report.pdf (18 pages, 2545673 bytes).
 PDF statistics:
- 119 PDF objects out of 1000 (max. 8388607)
+ 134 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
 
